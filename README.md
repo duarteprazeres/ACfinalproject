@@ -68,3 +68,45 @@ Todos os gráficos gerados pelo projeto devem aparecer na pasta graficos.
 | **XGBoost / LGBM** | RECOMENDADO | Não necessária | n_estimators, max_depth, learning_rate | A, B, C |
 | **Random Forest** | ALTERNATIVA | Não necessária | n_estimators, max_depth, min_samples_leaf | A, B, C |
 | **Logistic Regression**| ALTERNATIVA | Obrigatória | C, solver, multi_class | A (baseline) |
+
+---
+
+### Resumo das Preparações (Fase 1) - Base para o Relatório
+
+Esta secção detalha as decisões técnicas e transformações processadas na base de dados durante as fases 1.1 a 1.7, preparando a informação para a modelação algorítmica.
+
+#### 1.1 & 1.2: Inspecção e Limpeza de Dados
+O conjunto de dados inicial contém 15.000 instâncias e 13 variáveis. Analisou-se primeiramente a exclusão de colunas não preditivas de identificação geométrica (como o `user_id`). Verificou-se não existirem valores nulos (missing values) ou registos estritamente duplicados, validando a integridade do dataset. Foram compiladas as estatísticas descritivas das variáveis (média, desvio padrão e percentis), consolidando uma base rigorosa para enquadrar a demografia e padrão base da nossa população alvo.
+
+#### 1.3: Transformação do Target (Cenários A, B e C)
+Para dar resposta aos problemas propostos, a variável preditiva subjacente (`stress_level`) precisou de ser separada:
+- **Cenário A (Binário)**: Otimizou-se a fronteira baseada no limiar de divisão `>= 7.38`, construindo um binário razoavelmente mais equilibrado do que se dividíssemos na mediana natural. 
+- **Cenário B (5 Classes)**: Aplicou-se um enquadramento por percentis (Equal-Frequency binning com *pd.qcut*) de modo a dividir uniformemente os graus de intensidade de stress pelas 5 esferas (Níveis 0 a 4).
+- **Cenário C (10 Classes)**: Empregaram-se e avaliaram-se três métodos empíricos autónomos de "clustering" das 10 quantificações — nomeadamente distâncias k-Means, distâncias métricas lineares (Equal-Width) e dispersão de decil (Equal-frequency).
+
+#### 1.4: Análise Exploratória de Dados (EDA)
+Foram exportados gráficos sistemáticos e documentais para o repositório (`graficos/`):
+- Mapas KDE/Histograma na extração do perfil estatístico das covariáveis numéricas e os respetivos comportamentos de target imbalance.
+- Identificação de multicorrelações usando Mapas de Cor de Pearson (Heatmaps), relevando dependências fortes contra o stress. 
+- Investigação em subgrupos com Box Plots condicionados ao cenário de targets multiclasse mais propensos e o isolamento dos cruzamentos críticos de maior importância (Scatters via Pairplots).
+
+#### 1.5: Feature Engineering
+Extraiu-se conhecimento oculto da estrutura gerando variáveis combinadas superiores aos preditores singulares da base de dados originais:
+- **Rácios de Proporção**: Rácios entre `ecrã vs tempo a dormir` bem como percentagem de esforço motor sobre esse mesmo ecrã (`atividade / tempo_ecrã`).
+- **Interações e Multiplos**: Cruzaram-se penalizações somadas de horas de ecrã mediante o peso do `mental_fatigue_score`.
+- **Dicotomias de Alarme (Flags)**: Identificação puramente binária de grupos clínicos vulneráveis, nomeadamente sedentarismo (desporto inferir a 30 minutos) e privações de sono (sleep < 6h). Finalizou-se calculando o peso intrínseco (importance_feature) num ensaio com Random Forest base, servindo para retirar atributos excessivamente correlacionados (Pearson > 0.95).
+
+#### 1.6: Pré-processamento e Isolamento (Data Leakage)
+Fracionámos as instâncias com amostragem estratificada (`stratify`) garantindo que as percentagens relativas das classes raras foram copiadas para a matriz de 70% Treino e as vizinhanças dos 15% Validação / 15% Teste.  Implementou-se ainda o `StandardScaler()`, rigidamente forçado com o `fit()` em modo fechado unicamente no cofre de Treino. Qualquer valor da base de validação e de holdout será transformado na projeção desvio unicamente baseada no treino (minimizando integralmente o Data Leakage). 
+
+#### 1.7: Atenuação de Desequilíbrio
+Diagnosticaram-se assimetrias sensíveis com o fracionamento policategórico dos targets C e B. Inseriu-se código para teste unitário de mitigadores baseados na biblioteca `imbalanced-learn`:
+- **Oversampling Sintético**: Foram testadas a extração de vizinhos SMOTE e de reponderação adversária ADASYN como fontes artificiais das instâncias subrepresentadas. 
+- **Destruição Aleatória (Undersampling)**: Remoção estocástica para o mínimo múltiplo comum sob o RandomUnderSampler.
+Os outputs gerados revelam métricas e distribuições preparadas para alimentar a estrutura principal dos testes dos próximos modelos SVM e Redes Neuronais.
+
+#### Nota Técnica: Arquitetura de Código (Modularidade e `def main()`)
+A estrutura final do código script `main.py` abandonou a execução linear aberta do Python em prol de um design rigorosamente modular unificado pelo controlador `if __name__ == '__main__':`. Este paradigma foi essencial devido aos seguintes critérios do Mercado ML:
+- **Prevenção Máxima de Data Leakage vs Variáveis Globais**: O encapsulamento lógico em blocos fechados (como ex: `def feature_engineering(df):`) garantiu o esvaziamento iminente das variáveis intermédias de memória (Scope local). Evitaram-se as armadilhas perigosas da persistência de variáveis globais que, num ambiente solto, poderiam contaminar acidentalmente o cruzamento final entre o Dataset de Validação e o Treino.
+- **Importabilidade Robusta Segura**: A declaração no main bloqueou as auto-execuções. Qualquer módulo colega posterior, ou blocos em Jupyter Notebooks das próximas secções de Rede Neuronal poderão executar explicitamente comandos como `from main import generate_targets` usufruindo da capacidade da função original sem provocar imediatamente a repetição temporal maciça dos gráficos de EDA ou simulação pesada do Oversampling.
+- **Micro-gestão Otimizada de Testes**: A hierarquia dividida entre funções puras e a invocação agrupada tornou extremamente simples desligar ou ignorar etapas pesadas já computadas e validadas (comentando uma única linha de chamada na base sem perder um fio condutor para todos os próximos modelos do passo 2).
