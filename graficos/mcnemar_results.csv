@@ -1,0 +1,10 @@
+scenario,pair,b,c,mcnemar_p
+A,svm vs nn,33,25,0.3581
+A,svm vs xgb,13,20,0.2962
+A,nn vs xgb,27,42,0.0912
+B,svm vs nn,63,45,0.1014
+B,svm vs xgb,53,47,0.6173
+B,nn vs xgb,70,82,0.3723
+C,svm vs nn,110,143,0.044
+C,svm vs xgb,109,120,0.5088
+C,nn vs xgb,173,151,0.2433
