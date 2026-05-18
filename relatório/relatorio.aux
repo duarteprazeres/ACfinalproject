@@ -6,73 +6,104 @@
 \providecommand\HyField@AuxAddToFields[1]{}
 \providecommand\HyField@AuxAddToCoFields[2]{}
 \babel@aux{portuguese}{}
+\citation{kaggle}
+\citation{badrnezhad2024}
+\citation{tolstoyj2024}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introdução}{3}{section.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {2}Arquitetura e Modularidade do Projeto}{3}{section.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {3}Dataset e Análise Exploratória}{3}{section.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Descrição do Dataset}{3}{subsection.3.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Limpeza e Qualidade dos Dados}{4}{subsection.3.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Visualizações EDA}{4}{subsection.3.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Distribuições univariadas das variáveis numéricas.}}{4}{figure.caption.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Heatmap de correlação de Pearson. Destaque para \texttt  {mental\_fatigue\_score} e \texttt  {daily\_screen\_time\_hours} como preditores mais correlacionados com o stress.}}{5}{figure.caption.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Distribuição dos targets nos Cenários A, B e C.}}{5}{figure.caption.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2}Background}{3}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Trabalhos na Plataforma Kaggle}{3}{subsection.2.1}\protected@file@percent }
+\citation{huang2024}
+\citation{lei2024}
+\citation{acosta2025}
+\citation{lei2024}
+\citation{huang2024}
+\citation{acosta2025}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Literatura Académica Relacionada}{4}{subsection.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Posicionamento deste Trabalho}{4}{subsection.2.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Comparação com trabalhos relacionados (classificação binária).}}{5}{table.caption.2}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{tab:background_comp}{{1}{5}{Comparação com trabalhos relacionados (classificação binária)}{table.caption.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Dataset e Análise Exploratória}{5}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Descrição do Dataset}{5}{subsection.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Limpeza e Qualidade dos Dados}{5}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Visualizações EDA}{5}{subsection.3.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Distribuições univariadas das variáveis numéricas.}}{6}{figure.caption.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Heatmaps de correlação de Pearson (esquerda) e Spearman (direita). Os três preditores dominantes são os mesmos em ambas as métricas, mas \texttt  {sleep\_quality\_score} e \texttt  {daily\_screen\_time\_hours} mostram correlação de Spearman ligeiramente superior.}}{7}{figure.caption.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Distribuição dos targets nos Cenários A, B e C após discretização.}}{7}{figure.caption.5}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Box plot da variável mais correlacionada por classe (Cenário B).}}{8}{figure.caption.6}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Pairplot das três features mais correlacionadas com o stress, coloridas por classe do Cenário B.}}{9}{figure.caption.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}Metodologia}{9}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Transformação do Target}{9}{subsection.4.1}\protected@file@percent }
 \gdef \LT@i {\LT@entry 
     {1}{162.91708pt}\LT@entry 
     {1}{268.0748pt}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Box plot da variável mais correlacionada por classe (Cenário B).}}{6}{figure.caption.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {4}Transformação do Target}{6}{section.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5}Feature Engineering}{6}{section.5}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Importância das features calculada com base no modelo XGBoost (Cenário A). Todos os valores quantitativos de importância discutidos no texto apoiam-se nesta análise de pesos e de impureza (\textit  {Gini}).}}{7}{figure.caption.6}\protected@file@percent }
-\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
-\newlabel{fig:feat_imp}{{5}{7}{Importância das features calculada com base no modelo XGBoost (Cenário A). Todos os valores quantitativos de importância discutidos no texto apoiam-se nesta análise de pesos e de impureza (\textit {Gini})}{figure.caption.6}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {6}Pré-processamento}{7}{section.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Divisão dos Dados}{7}{subsection.6.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Normalização e Prevenção de Data Leakage}{8}{subsection.6.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Lidar com o Desequilíbrio de Classes}{8}{subsection.6.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {7}Métricas de Avaliação}{8}{section.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Feature Engineering}{10}{subsection.4.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Importância das features calculada pelo XGBoost (Cenário A) via Gini impurity.}}{11}{figure.caption.8}\protected@file@percent }
+\newlabel{fig:feat_imp}{{6}{11}{Importância das features calculada pelo XGBoost (Cenário A) via Gini impurity}{figure.caption.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Pré-processamento}{11}{subsection.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.3.1}Divisão dos Dados}{11}{subsubsection.4.3.1}\protected@file@percent }
 \gdef \LT@ii {\LT@entry 
     {1}{85.95897pt}\LT@entry 
     {1}{116.09033pt}\LT@entry 
     {1}{211.16928pt}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.3.2}Normalização e Prevenção de Data Leakage}{12}{subsubsection.4.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.3.3}Lidar com o Desequilíbrio de Classes}{12}{subsubsection.4.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Métricas de Avaliação}{12}{subsection.4.4}\protected@file@percent }
+\citation{huang2024}
 \citation{cortes1995}
 \citation{rumelhart1986}
-\@writefile{toc}{\contentsline {section}{\numberline {8}Modelos Implementados}{9}{section.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}Support Vector Machine (SVM)}{9}{subsection.8.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Modelos Implementados}{13}{subsection.4.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.5.1}Support Vector Machine (SVM)}{13}{subsubsection.4.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.5.2}Rede Neuronal (MLPClassifier)}{13}{subsubsection.4.5.2}\protected@file@percent }
 \citation{chen2016}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Rede Neuronal (MLPClassifier)}{10}{subsection.8.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}XGBoost -- 3.º Modelo}{10}{subsection.8.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {9}Validação Cruzada (Cross-Validation)}{11}{section.9}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Cross-Validation Baseline -- F1 Macro (mean $\pm $ std)}}{11}{table.caption.7}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Gráfico de barras do CV Baseline para todos os modelos e cenários.}}{12}{figure.caption.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {10}Pipeline de Produção e Guardar Modelos (.pkl)}{12}{section.10}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {11}Resultados Finais de Avaliação}{12}{section.11}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Sumário de Resultados de Teste nos diferentes cenários e modelos. Esta imagem suporta toda a quantificação e validação cruzada do F1 discutidos no longo do projeto.}}{13}{figure.caption.9}\protected@file@percent }
-\newlabel{fig:tabela_resultados_final}{{7}{13}{Sumário de Resultados de Teste nos diferentes cenários e modelos. Esta imagem suporta toda a quantificação e validação cruzada do F1 discutidos no longo do projeto}{figure.caption.9}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Resultados no conjunto de validação interna do GridSearch -- F1 Macro (após tuning)}}{13}{table.caption.10}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {11.1}Confusion Matrices -- Cenário A}{13}{subsection.11.1}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Confusion matrices normalizadas -- Cenário A (Binário).}}{13}{figure.caption.11}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {11.2}Confusion Matrices -- Cenário B}{14}{subsection.11.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Confusion matrices normalizadas -- Cenário B (5 Classes).}}{14}{figure.caption.12}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {11.3}Confusion Matrices -- Cenário C}{14}{subsection.11.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Confusion matrices normalizadas -- Cenário C (10 Classes).}}{14}{figure.caption.13}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {11.4}Curvas de Loss -- Rede Neuronal}{14}{subsection.11.4}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Curvas de loss da MLP nos três cenários. A convergência rápida e a ausência de divergência indicam treino estável.}}{14}{figure.caption.14}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {12}Análise Crítica dos Resultados}{14}{section.12}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {12.1}Cenário A -- Classificação Binária}{14}{subsection.12.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {12.2}Cenário B -- 5 Classes}{15}{subsection.12.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {12.3}Cenário C -- Trade-offs de Granularidade (10 Classes)}{15}{subsection.12.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Learning Curves do XGBoost. O gráfico corrobora quantitativamente o trade-off prático do problema de classificação de 10 classes: o patamar máximo de estabilidade (Score médio $\sim 0.60$) é incontestavelmente menor comparativamente aos cenários mais modestos da esquerda.}}{16}{figure.caption.15}\protected@file@percent }
-\newlabel{fig:learning_curves_tradeoff}{{12}{16}{Learning Curves do XGBoost. O gráfico corrobora quantitativamente o trade-off prático do problema de classificação de 10 classes: o patamar máximo de estabilidade (Score médio $\sim 0.60$) é incontestavelmente menor comparativamente aos cenários mais modestos da esquerda}{figure.caption.15}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {12.4}Comparação entre Modelos}{16}{subsection.12.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {12.5}Efeito do Tuning}{16}{subsection.12.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {12.6}Interpretabilidade Local (SHAP)}{16}{subsection.12.6}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces Gráfico SHAP Summary para XGBoost (Cenário A). Suporta materialmente com dados locais a evidência estatística em massa do projeto e dita o sentido lógico direto que a fadiga mental opera no stress e target avaliado.}}{17}{figure.caption.16}\protected@file@percent }
-\newlabel{fig:shap_xgb}{{13}{17}{Gráfico SHAP Summary para XGBoost (Cenário A). Suporta materialmente com dados locais a evidência estatística em massa do projeto e dita o sentido lógico direto que a fadiga mental opera no stress e target avaliado}{figure.caption.16}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {12.7}Limitações e o Desafio do Mundo Real}{17}{subsection.12.7}\protected@file@percent }
+\citation{shwartz2022}
+\citation{huang2024}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.5.3}XGBoost -- 3.º Modelo}{14}{subsubsection.4.5.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.6}Validação Cruzada}{14}{subsection.4.6}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Cross-Validation Baseline -- F1 Macro ($\mu \pm \sigma $, 5 folds)}}{15}{table.caption.9}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Resultados do CV Baseline para todos os modelos e cenários.}}{15}{figure.caption.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Resultados e Discussão}{15}{section.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Resultados no Conjunto de Teste (Hold-out)}{15}{subsection.5.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Resultados finais no conjunto de teste hold-out -- métricas por modelo e cenário.}}{16}{table.caption.11}\protected@file@percent }
+\newlabel{tab:test_results}{{5}{16}{Resultados finais no conjunto de teste hold-out -- métricas por modelo e cenário}{table.caption.11}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Visualização gráfica da tabela comparativa final (hold-out test set).}}{16}{figure.caption.12}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Matrizes de Confusão}{16}{subsection.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.1}Cenário A -- Classificação Binária}{16}{subsubsection.5.2.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Confusion matrices normalizadas -- Cenário A (Binário).}}{16}{figure.caption.13}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.2}Cenário B -- 5 Classes}{17}{subsubsection.5.2.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Confusion matrices normalizadas -- Cenário B (5 Classes).}}{17}{figure.caption.14}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.3}Cenário C -- 10 Classes}{17}{subsubsection.5.2.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Confusion matrices normalizadas -- Cenário C (10 Classes).}}{17}{figure.caption.15}\protected@file@percent }
+\citation{lei2024}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Curvas de Loss -- Rede Neuronal}{18}{subsection.5.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Curvas de loss da MLP nos três cenários. A convergência sem divergência indica treino estável e ausência de overfitting grosseiro.}}{18}{figure.caption.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Análise Crítica por Cenário}{18}{subsection.5.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.4.1}Cenário A -- Classificação Binária}{18}{subsubsection.5.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.4.2}Cenário B -- 5 Classes}{19}{subsubsection.5.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.4.3}Cenário C -- Trade-offs de Granularidade (10 Classes)}{19}{subsubsection.5.4.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces Learning Curves do XGBoost. O patamar assintótico decresce do Cenário A ($\sim $0.94) para o C ($\sim $0.60), confirmando que o trade-off de granularidade é intrínseco ao problema e não resolúvel com mais dados.}}{19}{figure.caption.17}\protected@file@percent }
+\newlabel{fig:learning_curves_tradeoff}{{13}{19}{Learning Curves do XGBoost. O patamar assintótico decresce do Cenário A ($\sim $0.94) para o C ($\sim $0.60), confirmando que o trade-off de granularidade é intrínseco ao problema e não resolúvel com mais dados}{figure.caption.17}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Comparação entre Modelos}{20}{subsection.5.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.6}Efeito do Tuning de Hiperparâmetros}{20}{subsection.5.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.7}Interpretabilidade Local (SHAP)}{20}{subsection.5.7}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces SHAP Summary Plot -- XGBoost, Cenário A. Cada ponto representa uma instância; a posição horizontal indica a direção e magnitude do impacto no output do modelo.}}{21}{figure.caption.18}\protected@file@percent }
+\newlabel{fig:shap_xgb}{{14}{21}{SHAP Summary Plot -- XGBoost, Cenário A. Cada ponto representa uma instância; a posição horizontal indica a direção e magnitude do impacto no output do modelo}{figure.caption.18}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.8}Testes de Significância Estatística}{21}{subsection.5.8}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Resultados do teste de McNemar -- valor-$p$ (exact). $\star $ = $p < 0.05$.}}{21}{table.caption.19}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Resultados do teste de Wilcoxon com $k=5$ folds. Nenhum par atinge $p < 0.05$.}}{22}{table.caption.20}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.9}Limitações e Desafios}{22}{subsection.5.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Conclusões}{22}{section.6}\protected@file@percent }
+\citation{lei2024}
+\citation{acosta2025}
 \bibcite{cortes1995}{1}
 \bibcite{rumelhart1986}{2}
 \bibcite{chen2016}{3}
 \bibcite{shwartz2022}{4}
-\@writefile{toc}{\contentsline {section}{\numberline {13}Conclusões}{18}{section.13}\protected@file@percent }
 \bibcite{pedregosa2011}{5}
 \bibcite{kaggle}{6}
-\gdef \@abspage@last{19}
+\bibcite{badrnezhad2024}{7}
+\bibcite{tolstoyj2024}{8}
+\bibcite{huang2024}{9}
+\bibcite{lei2024}{10}
+\bibcite{acosta2025}{11}
+\gdef \@abspage@last{24}

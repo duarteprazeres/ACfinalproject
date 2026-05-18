@@ -139,11 +139,29 @@ def run_eda(df):
     plt.savefig('graficos/eda_targets.png')
     plt.close()
     
-    # 3. Matriz de correlação
+    # 3. Matrizes de correlação (Pearson + Spearman lado a lado)
+    corr_cols = num_cols + ['stress_level']
+    pearson_corr = df[corr_cols].corr(method='pearson')
+    spearman_corr = df[corr_cols].corr(method='spearman')
+
+    fig, axes = plt.subplots(1, 2, figsize=(20, 8))
+    sns.heatmap(pearson_corr, annot=True, cmap='coolwarm', fmt=".2f", ax=axes[0],
+                annot_kws={"size": 7})
+    axes[0].set_title('Correlação de Pearson\n(relações lineares)', fontsize=13)
+    axes[0].tick_params(labelsize=7)
+    sns.heatmap(spearman_corr, annot=True, cmap='coolwarm', fmt=".2f", ax=axes[1],
+                annot_kws={"size": 7})
+    axes[1].set_title('Correlação de Spearman\n(relações monotónicas)', fontsize=13)
+    axes[1].tick_params(labelsize=7)
+    plt.tight_layout()
+    plt.savefig('graficos/eda_correlacao_combined.png', dpi=150, bbox_inches='tight')
+    plt.close()
+
+    # Manter também versão Pearson isolada para compatibilidade
+    corr = pearson_corr
     plt.figure(figsize=(10, 8))
-    corr = df[num_cols + ['stress_level']].corr()
     sns.heatmap(corr, annot=True, cmap='coolwarm', fmt=".2f")
-    plt.title('Heatmap - Correlação com o Target')
+    plt.title('Heatmap - Correlação de Pearson com o Target')
     plt.savefig('graficos/eda_correlacao.png')
     plt.close()
     
