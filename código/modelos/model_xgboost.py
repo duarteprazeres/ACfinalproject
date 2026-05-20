@@ -209,23 +209,25 @@ def main():
     print("   MODEL_XGBOOST.PY — XGBoost Gradient Boosting")
     print("=" * 60)
 
-    filepath = 'sleep_mobile_stress_dataset_15000.csv'
+    filepath = 'dataset/sleep_mobile_stress_dataset_15000.csv'
     if not os.path.exists(filepath):
-        print(f"Erro: '{filepath}' não encontrado.")
+        filepath = 'sleep_mobile_stress_dataset_15000.csv'
+    if not os.path.exists(filepath):
+        print(f"Erro: ficheiro CSV não encontrado.")
         return
 
     df           = load_and_inspect_data(filepath)
     df           = generate_targets(df)
     X_raw, df_fe = feature_engineering(df)
 
-    valid    = ~df_fe[['target_A', 'target_B', 'target_C']].isnull().any(axis=1)
+    valid    = ~df_fe[['target_A', 'target_B_ew', 'target_C_ew']].isnull().any(axis=1)
     X_raw    = X_raw[valid].reset_index(drop=True)
     df_fe    = df_fe[valid].reset_index(drop=True)
 
     scenarios = {
         'A': df_fe['target_A'].astype(int),
-        'B': df_fe['target_B'].astype(int),
-        'C': df_fe['target_C'].astype(int),
+        'B': df_fe['target_B_ew'].astype(int),
+        'C': df_fe['target_C_ew'].astype(int),
     }
 
     # --- CV Baseline ---
