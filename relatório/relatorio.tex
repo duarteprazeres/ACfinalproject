@@ -163,50 +163,81 @@ de dados sintéticos.
 \subsection{Transformação do Target}
 \label{sec:targets}
 
-Uma das primeiras decisões que tivemos de tomar foi como transformar a variável contínua
-\texttt{stress\_level} em classes discretas para cada cenário. O processo não foi linear
--- passámos por duas estratégias de discretização, sendo que os resultados da primeira
-motivaram a adoção da segunda.
+O enunciado define três cenários de classificação com granularidades diferentes.
+A primeira tarefa foi converter a variável contínua \texttt{stress\_level} em classes
+discretas. Para cada cenário, definimos um objetivo e escolhemos uma estratégia de
+discretização:
 
-\textbf{Cenário A (2 Classes)}: Aqui não houve iteração. Usámos \textit{equal-frequency
-binning} com ponto de corte na mediana ($7.38$), obtendo duas classes equilibradas
-``Sem Stress'' (0) e ``Com Stress'' (1) com distribuição $\approx$50/50.
+\begin{itemize}
+  \item \textbf{Cenário A -- 2 classes}: separar os dados em ``Sem Stress'' (0) e
+    ``Com Stress'' (1). Usámos \textit{equal-frequency binning} com ponto de corte
+    na mediana ($7.38$), porque o equilíbrio resultante ($\approx$50/50) impede que
+    os modelos fiquem tendenciosos para a classe maioritária.
+
+  \item \textbf{Cenário B -- 5 classes}: dividir o stress em cinco níveis de
+    intensidade crescente (0 a 4). Aplicámos também \textit{equal-frequency binning}
+    (\texttt{pd.qcut} com $q=5$), com a lógica de garantir aproximadamente o mesmo
+    número de instâncias por classe.
+
+  \item \textbf{Cenário C -- 10 classes}: mesma lógica, mas com dez níveis
+    (\texttt{pd.qcut} com $q=10$), para uma granularidade mais fina.
+\end{itemize}
+
+Com estas estratégias aplicadas, obtivemos a seguinte distribuição de classes e
+amostras por target:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{../graficos/eda_targets.png}
+  \caption{Distribuição dos targets com \textit{equal-frequency binning} para os três
+    cenários. O Cenário A produziu 2 classes equilibradas; os Cenários B e C
+    produziram apenas 4 e 8 classes, respetivamente, em vez das 5 e 10 previstas.}
+  \label{fig:targets_t1}
+\end{figure}
+
+Para o Cenário A o algoritmo funcionou como esperado. Para os Cenários B e C,
+deparámo-nos com um problema que não antecipámos. Ao visualizar a distribuição
+resultante, verificámos imediatamente que algo estava errado: o Cenário B tinha apenas
+\textbf{4 barras}, não 5, e o Cenário C tinha apenas \textbf{8 barras}, não 10.
+Ao investigar a causa, percebemos que o problema estava na distribuição do próprio
+dataset: mais de 20\% dos registos têm \texttt{stress\_level} = 10.0 (o valor máximo).
+Isto faz com que o 80.º percentil seja 10.0, que é também o máximo absoluto. Para o
+Cenário B, as fronteiras do 4.º e do 5.º bin são ambas 10.0 -- idênticas. O algoritmo
+\texttt{pd.qcut}, ao detetar esta fronteira duplicada, funde automaticamente os dois
+bins superiores num só, reduzindo o número de classes de 5 para 4. No Cenário C o
+mesmo mecanismo elimina três bins superiores (os percentis 80, 90 e 100 coincidem
+todos em 10.0), reduzindo de 10 para 8 classes. Como o enunciado exige explicitamente
+5 e 10 classes, esta estratégia revelou-se inadequada.
 
 \medskip
-\noindent\textbf{Cenários B e C -- Tentativa 1: Equal-Frequency Binning}
+\noindent\textbf{Como ultrapassámos este problema.}
+A raiz do problema estava na natureza do \textit{equal-frequency binning}: ao definir
+fronteiras com base nos percentis dos dados, o algoritmo não consegue criar bins
+distintos quando muitos valores se acumulam num único ponto. A solução passou por
+mudar de estratégia: em vez de garantir \textbf{contagens iguais} por classe,
+passámos a garantir \textbf{intervalos de valores iguais} entre classes --
+\textit{equal-width binning} (\texttt{pd.cut}). Com esta abordagem, o intervalo
+$[\min, \max]$ do \texttt{stress\_level} é dividido em partes geometricamente iguais,
+independentemente de quantas instâncias caem em cada parte, produzindo sempre
+exatamente o número de classes pedido.
 
-O plano inicial para os Cenários B e C era usar também \textit{equal-frequency binning}
-(\texttt{pd.qcut}): dividir os dados em 5 quantis para o Cenário B e em 10 quantis para
-o Cenário C, garantindo assim aproximadamente o mesmo número de instâncias por classe.
-Ao executar o algoritmo, contudo, deparámo-nos com um problema inesperado: mais de 20\%
-dos registos têm \texttt{stress\_level} = 10.0 (o valor máximo do dataset). Isto faz
-com que o 80.º percentil já seja 10.0 -- o mesmo que o máximo absoluto. As fronteiras
-do 4.º e 5.º bin do Cenário B tornaram-se idênticas e o algoritmo, ao detetar esta
-duplicação, fundiu os dois bins superiores num só. No Cenário C, os percentis 80, 90 e
-100 coincidem em 10.0, fundindo três bins. O resultado foi \textbf{4 classes efetivas}
-em vez de 5 no Cenário B, e \textbf{8 classes efetivas} em vez de 10 no Cenário C.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{../graficos/eda_targets_ew.png}
+  \caption{Distribuição dos targets com \textit{equal-width binning}. O Cenário B
+    apresenta exatamente 5 classes e o Cenário C exatamente 10 classes, cumprindo
+    o requisito do enunciado.}
+  \label{fig:targets_t2}
+\end{figure}
 
-\medskip
-\noindent\textbf{Cenários B e C -- Tentativa 2: Equal-Width Binning + Oversampling}
-
-Perante este resultado, decidimos mudar de estratégia. Em vez de garantir contagens
-iguais por classe (equal-frequency), passámos a garantir \textbf{intervalos de valores
-iguais} entre classes (\textit{equal-width binning}, \texttt{pd.cut}): o intervalo de
-valores do \texttt{stress\_level} é dividido em partes iguais, independentemente de
-quantas instâncias caem em cada parte. Esta abordagem cria \textbf{exatamente 5 classes}
-no Cenário B e \textbf{exatamente 10 classes} no Cenário C, como o enunciado prevê.
-
-A contrapartida é um desequilíbrio de classes mais acentuado: a última classe
-(valores próximos de 10.0) concentra uma proporção significativamente maior de instâncias
-do que as restantes, devido precisamente ao efeito de teto do dataset. Para compensar,
-aplicámos \textbf{SMOTE} (\textit{Synthetic Minority Oversampling Technique}) ao
-conjunto de treino: o algoritmo gera instâncias sintéticas para as classes minoritárias
-por interpolação entre exemplos existentes, equilibrando a distribuição sem descartar
-dados reais. O SMOTE é aplicado \textit{apenas ao conjunto de treino}, depois da divisão
-treino/validação/teste, para evitar \textit{data leakage}.
-
-Os resultados desta secção relatam esta segunda estratégia (equal-width + SMOTE),
-que garante o número de classes pedido no enunciado.
+Como se pode observar na figura, a nova estratégia cria o número correto de classes.
+No entanto, introduz um problema diferente: o número de amostras por classe ficou
+bastante desequilibrado, com a última classe a concentrar muito mais instâncias do que
+as restantes -- consequência direta do efeito de teto do dataset. Este desequilíbrio
+será necessário endereçar antes do treino dos modelos, testando técnicas de
+\textit{oversampling} (gerar instâncias sintéticas nas classes minoritárias) ou
+\textit{undersampling} (reduzir instâncias na classe maioritária), como descrito
+na secção de pré-processamento (§\ref{sec:imbalance}).
 
 \subsection{Visualizações EDA}
 
@@ -297,79 +328,64 @@ próximas de zero em ambas as métricas -- confirmando que a capacidade preditiv
 dataset está essencialmente concentrada nas três variáveis-chave acima, algo que
 influenciou diretamente a nossa estratégia de feature engineering.
 
-Verificámos a distribuição dos targets produzidos por cada estratégia de discretização,
-o que foi determinante para a decisão de mudar de abordagem.
-
-\paragraph{Tentativa 1 (Equal-Frequency).}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.95\textwidth]{../graficos/eda_targets.png}
-  \caption{Tentativa 1 -- Distribuição dos targets com \textit{equal-frequency binning}.
-    Cenário B resultou em 4 classes efetivas (planeadas 5); Cenário C resultou em 8
-    classes efetivas (planeadas 10).}
-\end{figure}
-
-O gráfico evidencia o problema da Tentativa 1. No Cenário A o split é 50/50, como
-esperado. Nos Cenários B e C, contudo, a \textbf{última classe é notoriamente maior}:
-no Cenário B a classe 3 tem $\approx$6000 instâncias (o dobro das restantes) e no
-Cenário C a classe 7 tem $\approx$4500 (o triplo). A causa é o \textbf{efeito de teto}
-do dataset: mais de 20\% dos registos têm \texttt{stress\_level} = 10.0, o que faz
-com que o 80.º percentil já seja o valor máximo. As fronteiras superiores dos bins
-coincidem, o algoritmo deteta a duplicação e funde os bins -- resultando em 4 e 8
-classes efetivas em vez das 5 e 10 planeadas. Este resultado motivou a Tentativa 2.
-
-\paragraph{Tentativa 2 (Equal-Width).}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.85\textwidth]{../graficos/eda_targets_ew.png}
-  \caption{Tentativa 2 -- Distribuição dos targets com \textit{equal-width binning}.
-    Cenário B com exatamente 5 classes; Cenário C com exatamente 10 classes.}
-\end{figure}
-
-Com equal-width binning obtemos exatamente as 5 e 10 classes previstas no enunciado.
-O desequilíbrio persiste -- a última classe continua com mais instâncias do que as
-restantes, reflexo do efeito de teto -- mas agora é gerido por SMOTE aplicado ao
-conjunto de treino (descrito em §\ref{sec:imbalance}), em vez de por fusão de bins.
-Esta abordagem preserva a granularidade pedida.
-
 Complementámos com um box plot do \texttt{mental\_fatigue\_score} (o preditor mais
-correlacionado com o stress) por classe no Cenário B, para confirmar visualmente se
-as classes têm distribuições distintas.
+correlacionado com o stress) por classe, para confirmar visualmente se as classes têm
+distribuições distintas -- tanto no Cenário B (5 classes) como no Cenário C (10 classes).
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.7\textwidth]{../graficos/eda_boxplot.png}
-  \caption{Box plot do \texttt{mental\_fatigue\_score} por classe (Cenário B).}
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{../graficos/eda_boxplot.png}
+    \caption{Cenário B (5 classes)}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{../graficos/eda_boxplot_C.png}
+    \caption{Cenário C (10 classes)}
+  \end{subfigure}
+  \caption{Box plot do \texttt{mental\_fatigue\_score} por classe (equal-width).}
 \end{figure}
 
-O box plot confirma aquilo que a análise de correlação já antecipava: há uma separação
+Os box plots confirmam aquilo que a análise de correlação já antecipava: há uma separação
 clara e progressiva das medianas do \texttt{mental\_fatigue\_score} ao longo das classes
-do Cenário B -- de baixo stress (classe 0, fadiga baixa) para stress máximo (última
-classe, fadiga alta). As classes extremas têm distribuições bem separadas,
-enquanto as classes intermédias (1 e 2) apresentam sobreposição maior entre si. Este
-padrão antecipou exatamente o que depois observámos nas matrizes de confusão: os modelos
-distinguem bem os extremos mas confundem-se nas classes intermédias.
+de ambos os cenários -- de baixo stress (classe 0, fadiga baixa) para stress máximo
+(última classe, fadiga alta). As classes extremas têm distribuições bem separadas,
+enquanto as classes intermédias apresentam maior sobreposição entre si. No Cenário C,
+com 10 classes, esta sobreposição é naturalmente mais pronunciada dada a maior
+granularidade. Este padrão antecipou exatamente o que depois observámos nas matrizes
+de confusão: os modelos distinguem bem os extremos mas confundem-se nas classes intermédias.
 
-Por fim, gerámos um pairplot das três features mais correlacionadas com o stress para
-visualizar as relações entre pares de variáveis e avaliar a separabilidade visual
-das classes.
+Por fim, gerámos um pairplot das três features mais correlacionadas com o stress
+(\texttt{mental\_fatigue\_score}, \texttt{daily\_screen\_time\_hours} e
+\texttt{sleep\_quality\_score}) para visualizar as relações entre pares de variáveis
+e avaliar a separabilidade visual das classes.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.75\textwidth]{../graficos/eda_pairplot.png}
-  \caption{Pairplot das três features mais correlacionadas com o stress, coloridas
-    por classe do Cenário B.}
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{../graficos/eda_pairplot.png}
+    \caption{Cenário B (5 classes)}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{../graficos/eda_pairplot_C.png}
+    \caption{Cenário C (10 classes)}
+  \end{subfigure}
+  \caption{Pairplot das três features mais correlacionadas com o stress (equal-width).}
 \end{figure}
 
 O pairplot confirma a estrutura do problema de forma visual. Nos scatter plots fora
 da diagonal, é percetível uma separação razoável entre as classes, especialmente
 nas projeções que envolvem o \texttt{mental\_fatigue\_score}: os pontos de classes
-extremas (coloração mais escura vs.\ mais clara) tendem a ocupar regiões distintas
-do espaço de features. Nas distribuições diagonais (KDE por classe), as classes
-intermédias sobrepõem-se significativamente entre si, mas distinguem-se das extremas.
-Ficámos satisfeitos com este resultado: a separabilidade visual, ainda que imperfeita,
+extremas tendem a ocupar regiões distintas do espaço de features. No Cenário C,
+a maior granularidade torna a sobreposição entre classes adjacentes mais evidente,
+antecipando o desafio acrescido de classificação com 10 categorias. Nas distribuições
+diagonais (KDE por classe), as classes intermédias sobrepõem-se significativamente
+entre si, mas distinguem-se das extremas. A separabilidade visual, ainda que imperfeita,
 confirmou-nos que os modelos teriam informação suficiente para aprender -- e ajudou-nos
 a calibrar as expectativas de desempenho antes de avançar para a modelação.
 
@@ -387,14 +403,14 @@ diretamente. Criámos cinco novas variáveis, cada uma com uma justificação es
 \toprule
 \textbf{Feature} & \textbf{Descrição e Justificação} \\
 \midrule
-\texttt{ratio\_usage\_sleep} & Rácio ecrã/sono. Criámos esta feature porque acreditamos
+\texttt{racio\_ecra\_sono} & Rácio ecrã/sono. Criámos esta feature porque acreditamos
   que o efeito do ecrã no stress não é absoluto, mas relativo à quantidade de sono --
   quem dorme pouco e usa muito o ecrã está em situação muito diferente de quem dorme
   bastante. \\
-\texttt{ratio\_activity\_usage} & Atividade física dividida pelo tempo de ecrã.
+\texttt{racio\_atividade\_ecra} & Atividade física dividida pelo tempo de ecrã.
   Representa um indicador de estilo de vida equilibrado: valores altos sugerem que a
   pessoa equilibra o sedentarismo digital com movimento. \\
-\texttt{interaction\_usage\_fatigue} & Produto de \texttt{screen\_time} $\times$
+\texttt{interacao\_ecra\_fadiga} & Produto de \texttt{daily\_screen\_time\_hours} $\times$
   \texttt{mental\_fatigue\_score}. Criámos esta interação para capturar o efeito
   multiplicativo entre os dois preditores mais fortes. Acabou por ser \textbf{removida}
   porque apresentava correlação $>0.95$ com \texttt{mental\_fatigue\_score}, o que
@@ -409,33 +425,34 @@ diretamente. Criámos cinco novas variáveis, cada uma com uma justificação es
 \bottomrule
 \end{longtable}
 
-Para validar as nossas escolhas, corremos uma avaliação de importância preliminar com um
-Random Forest simples e confirmámos que as features com correlação cruzada $>0.95$ seriam
-eliminadas automaticamente. A Figura~\ref{fig:feat_imp} confirma que o
-\texttt{mental\_fatigue\_score} e o \texttt{daily\_screen\_time\_hours} continuam a ser
-os preditores dominantes -- o que nos deu confiança de que o dataset tem informação
-preditiva real. As features que criámos (\texttt{ratio\_usage\_sleep} e
-\texttt{ratio\_activity\_usage}) aparecem com alguma importância, mas inferior
-à das três variáveis originais dominantes -- ou seja, contribuem, mas não são as
-que mais pesam nas decisões do modelo.
+Para validar as nossas escolhas antes de avançar para a modelação, corremos uma avaliação
+de importância preliminar com um \textbf{Random Forest} simples (50 árvores, Cenário A).
+Esta é uma técnica agnóstica ao modelo de classificação final, adequada para uma validação
+exploratória nesta fase.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.85\textwidth]{../graficos/feat_imp_xgb_A.png}
-  \caption{Importância das features calculada pelo XGBoost (Cenário A) via Gini impurity.}
+  \includegraphics[width=0.85\textwidth]{../graficos/feat_imp_rf_preliminar.png}
+  \caption{Importância preliminar das features calculada com Random Forest (Cenário A,
+    Gini impurity), antes do filtro de correlação cruzada. A
+    \texttt{interacao\_ecra\_fadiga} aparece no topo por ser um composto das duas
+    variáveis mais fortes, sendo depois removida por multicolinearidade.}
   \label{fig:feat_imp}
 \end{figure}
 
-O gráfico de importância confirma e quantifica o que a análise de correlação já sugeria.
-O \texttt{mental\_fatigue\_score} domina de forma clara, com uma importância substancialmente
-acima de todas as outras features. O \texttt{daily\_screen\_time\_hours} e o
-\texttt{sleep\_quality\_score} surgem em segundo e terceiro lugar, respetivamente.
-Mais encorajador ainda, os rácios que criámos -- \texttt{ratio\_usage\_sleep} e
-\texttt{ratio\_activity\_usage} -- aparecem com importância não nula, validando a
-nossa decisão de os criar. As features com importância próxima de zero, como
-\texttt{caffeine\_intake\_cups} ou \texttt{age}, confirmam o que as correlações de Pearson
-e Spearman já tinham revelado: neste dataset sintético, a capacidade preditiva concentra-se
-em três variáveis-chave, sendo as restantes maioritariamente sem poder discriminativo.
+\begin{sloppypar}
+O gráfico confirma e quantifica o que a análise de correlação já sugeria.
+A \texttt{interacao\_ecra\_fadiga} aparece no topo da importância -- o que faz sentido,
+pois é um produto dos dois preditores mais fortes, concentrando o seu efeito combinado
+-- mas será removida a seguir pelo filtro de correlação cruzada ($>0.95$ com
+\texttt{mental\_fatigue\_score}). Excluindo a interação, o \texttt{mental\_fatigue\_score}
+domina, seguido do \texttt{daily\_screen\_time\_hours} e do \texttt{sleep\_quality\_score}.
+Os rácios criados -- \texttt{racio\_ecra\_sono} e \texttt{racio\_atividade\_ecra} --
+aparecem com importância não nula, validando a decisão de os criar. As features com
+importância próxima de zero, como \texttt{caffeine\_intake\_cups} ou \texttt{age},
+confirmam o que as correlações de Pearson e Spearman já tinham revelado: neste dataset
+sintético, a capacidade preditiva concentra-se em poucas variáveis-chave.
+\end{sloppypar}
 
 \subsection{Pré-processamento}
 
@@ -468,24 +485,16 @@ do scikit-learn, que repete automaticamente este processo correto em cada fold.
 \subsubsection{Lidar com o Desequilíbrio de Classes}
 \label{sec:imbalance}
 
-Nos Cenários B e C, a última classe concentra mais instâncias do que as restantes
-devido ao efeito de teto do dataset. A estratégia para lidar com este desequilíbrio
-evoluiu em paralelo com a estratégia de discretização.
-
-\textbf{Na Tentativa 1 (equal-frequency)}, como a última classe agregada era muito
-maior que as restantes, usámos \textbf{ponderação interna dos modelos}
-(\texttt{class\_weight} e \texttt{sample\_weight} com valor \texttt{'balanced'}):
-o modelo penaliza mais os erros nas classes sub-representadas sem alterar os dados.
-Esta abordagem preserva a distribuição real e torna a avaliação mais honesta.
-
-\textbf{Na Tentativa 2 (equal-width)}, o desequilíbrio é mais pronunciado porque a
-última classe concentra proporcionalmente mais instâncias. Adoptámos
+Nos Cenários B e C, como descrito em §\ref{sec:targets}, a estratégia de
+\textit{equal-width binning} garante o número de classes pedido mas cria um
+desequilíbrio acentuado: a última classe concentra muito mais instâncias do que as
+restantes devido ao efeito de teto do dataset. Para compensar, adoptámos
 \textbf{SMOTE} (\textit{Synthetic Minority Oversampling Technique}), que gera
 instâncias sintéticas para as classes minoritárias por interpolação entre vizinhos
 próximos no espaço de features, sem descartar dados reais.
 
-Seguindo uma abordagem graduada -- em vez de saltar directamente para um balanceamento
-perfeito -- aplicámos quatro níveis e comparámos os resultados:
+Seguindo a recomendação de não saltar directamente para um balanceamento perfeito,
+aplicámos quatro níveis de oversampling e comparámos os resultados:
 \begin{enumerate}
   \item \textbf{Baseline}: sem resampling (distribuição original do treino);
   \item \textbf{SMOTE +5\%}: cada classe minoritária aumentada em 5\%;

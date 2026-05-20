@@ -208,18 +208,75 @@ def run_eda(df):
     plt.savefig('graficos/eda_correlacao.png')
     plt.close()
     
-    # 4. Box plots por classe (vs Cenário B)
+    # 4. Box plots por classe (equal-width) — Cenário B e Cenário C
     if len(num_cols) >= 2:
         plt.figure(figsize=(12, 6))
-        sns.boxplot(x='target_B', y=num_cols[0], data=df)
-        plt.title(f'{num_cols[0]} por Classe (Cenário B)')
+        sns.boxplot(x='target_B_ew', y='mental_fatigue_score', data=df)
+        plt.title('mental_fatigue_score por Classe - Cenário B (5 classes, equal-width)')
+        plt.xlabel('Classe')
         plt.savefig('graficos/eda_boxplot.png')
         plt.close()
-    
+
+        plt.figure(figsize=(14, 6))
+        sns.boxplot(x='target_C_ew', y='mental_fatigue_score', data=df)
+        plt.title('mental_fatigue_score por Classe - Cenário C (10 classes, equal-width)')
+        plt.xlabel('Classe')
+        plt.savefig('graficos/eda_boxplot_C.png')
+        plt.close()
+
         # 5. Pair plots das 3 variáveis mais correlacionadas com stress_level
-        top_features = corr['stress_level'].abs().sort_values(ascending=False).index[1:4].tolist()
-        sns.pairplot(df, vars=top_features, hue='target_B', palette='viridis')
+        # Excluir colunas target_* para não incluir variáveis derivadas do próprio target
+        target_cols = [c for c in corr.columns if c.startswith('target_') or c == 'stress_level']
+        corr_original = corr.drop(index=target_cols, columns=target_cols, errors='ignore')
+        stress_corr = df[corr_original.columns.tolist() + ['stress_level']].corr()
+        top_features = stress_corr['stress_level'].abs().sort_values(ascending=False).index[1:4].tolist()
+
+        sns.pairplot(df, vars=top_features, hue='target_B_ew', palette='viridis')
         plt.savefig('graficos/eda_pairplot.png')
+        plt.close()
+
+        # Paleta arco-íris: roxo escuro (classe 0, igual ao viridis do B) → vermelho (classe 9)
+        from matplotlib.colors import LinearSegmentedColormap
+        import matplotlib.cm as cm
+        _waypoints = [
+            cm.viridis(0.0),          # roxo escuro (viridis class 0)
+            (0.15, 0.10, 0.85, 1.0),  # azul-índigo
+            (0.00, 0.45, 0.90, 1.0),  # azul
+            (0.00, 0.80, 0.80, 1.0),  # ciano
+            (0.00, 0.75, 0.20, 1.0),  # verde
+            (0.80, 0.90, 0.00, 1.0),  # amarelo-verde
+            (1.00, 0.85, 0.00, 1.0),  # amarelo
+            (1.00, 0.55, 0.00, 1.0),  # laranja
+            (1.00, 0.20, 0.00, 1.0),  # vermelho-laranja
+            (0.90, 0.00, 0.00, 1.0),  # vermelho (classe 9)
+        ]
+        _n_classes = 10
+        _cmap = LinearSegmentedColormap.from_list('arco_iris', _waypoints, N=_n_classes)
+        _palette = {str(i): _cmap(i / (_n_classes - 1)) for i in range(_n_classes)}
+        # Converter para string para forçar tratamento categórico (todas as classes na legenda)
+        df_plot_C = df.copy()
+        _hue_order = [str(i) for i in range(_n_classes)]
+        _colors_list = [_cmap(i / (_n_classes - 1)) for i in range(_n_classes)]
+        df_plot_C['target_C_ew'] = pd.Categorical(
+            df_plot_C['target_C_ew'].astype(str),
+            categories=_hue_order,
+            ordered=True
+        )
+        _g = sns.pairplot(df_plot_C, vars=top_features, hue='target_C_ew',
+                          hue_order=_hue_order, palette=dict(zip(_hue_order, _colors_list)))
+        # Remover todas as legendas existentes (seaborn trunca com muitas classes)
+        from matplotlib.patches import Patch
+        _g.fig.legends.clear()
+        for _ax in _g.axes.flat:
+            _leg = _ax.get_legend()
+            if _leg is not None:
+                _leg.remove()
+        # Adicionar legenda manual com todas as 10 classes
+        _legend_elements = [Patch(facecolor=_colors_list[i], label=str(i), edgecolor='none')
+                            for i in range(_n_classes)]
+        _g.fig.legend(handles=_legend_elements, title='target_C_ew',
+                      bbox_to_anchor=(1.01, 0.5), loc='center left', frameon=True)
+        plt.savefig('graficos/eda_pairplot_C.png', dpi=150, bbox_inches='tight')
         plt.close()
     
     print("-> Gráficos da EDA guardados na pasta 'graficos/'.")
@@ -234,37 +291,48 @@ def feature_engineering(df):
     print("\n--- 1.5 Feature Engineering ---")
     df_fe = df.copy()
     epsilon = 1e-5
-    
-    # Rácios propostos
-    df_fe['ratio_usage_sleep'] = df_fe['daily_screen_time_hours'] / (df_fe['sleep_duration_hours'] + epsilon)
-    df_fe['ratio_activity_usage'] = (df_fe['physical_activity_minutes'] / 60.0) / (df_fe['daily_screen_time_hours'] + epsilon)
-    
-    # Interação entre features que podem potenciar o stress
-    df_fe['interaction_usage_fatigue'] = df_fe['daily_screen_time_hours'] * df_fe['mental_fatigue_score']
-    
-    # Variáveis Binárias
+
+    # Rácios (nomes em português, consistentes com restantes variáveis)
+    df_fe['racio_ecra_sono'] = df_fe['daily_screen_time_hours'] / (df_fe['sleep_duration_hours'] + epsilon)
+    df_fe['racio_atividade_ecra'] = (df_fe['physical_activity_minutes'] / 60.0) / (df_fe['daily_screen_time_hours'] + epsilon)
+
+    # Interação entre os dois preditores mais fortes
+    df_fe['interacao_ecra_fadiga'] = df_fe['daily_screen_time_hours'] * df_fe['mental_fatigue_score']
+
+    # Variáveis binárias
     df_fe['dorme_menos_6h'] = np.where(df_fe['sleep_duration_hours'] < 6, 1, 0)
     df_fe['sedentario'] = np.where(df_fe['physical_activity_minutes'] < 30, 1, 0)
-    
+
     # Identificar colunas para ignorar no modelo
     drop_cols = ['user_id', 'stress_level', 'target_A',
                  'target_B', 'target_C', 'target_B_ew', 'target_C_ew']
     drop_cols += [c for c in df_fe.columns if 'target_C_' in c]
-    
+
     X_tmp = df_fe.drop(columns=[c for c in drop_cols if c in df_fe.columns])
-    
-    # One-Hot Encoding rápido das nominais
+
+    # One-Hot Encoding das nominais
     categorical_cols = ['gender', 'occupation']
     X_enc = pd.get_dummies(X_tmp, columns=[c for c in categorical_cols if c in X_tmp.columns], drop_first=True)
-    
-    # Avaliar importâncias preliminares em relação ao Cenário A
+
+    # Avaliação preliminar de importâncias com Random Forest (neutro, sem revelar o 3.º modelo)
     rf = RandomForestClassifier(n_estimators=50, random_state=42)
     rf.fit(X_enc, df_fe['target_A'])
-    
+
     importances = pd.Series(rf.feature_importances_, index=X_enc.columns).sort_values(ascending=False)
     print("Importância Preliminar das Features (Top 5):")
     print(importances.head())
-    
+
+    # Guardar figura de importâncias (Random Forest, para validação preliminar)
+    os.makedirs('graficos', exist_ok=True)
+    plt.figure(figsize=(10, 6))
+    importances.head(12).plot(kind='barh')
+    plt.xlabel('Importância (Gini)')
+    plt.title('Importância Preliminar das Features (Random Forest)')
+    plt.gca().invert_yaxis()
+    plt.tight_layout()
+    plt.savefig('graficos/feat_imp_rf_preliminar.png', dpi=150)
+    plt.close()
+
     # Filtro de Correlação (>0.95)
     corr_matrix = X_enc.corr().abs()
     upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
@@ -272,7 +340,7 @@ def feature_engineering(df):
     if to_drop:
         print(f"Features removidas devido a correlação cruzada alta: {to_drop}")
         X_enc = X_enc.drop(columns=to_drop)
-    
+
     return X_enc, df_fe
 
 # 1.6 Pré-processamento Final e Divisão dos Dados
@@ -320,6 +388,8 @@ def apply_imbalance_strategies(X_train, y_train, percentages=(5, 10, 20)):
         # A classe maioritária não é alterada
         sampling_strategy = {}
         for cls, count in counts.items():
+            if count >= majority_count:
+                continue
             target = int(count * (1 + pct / 100.0))
             if target > count:
                 sampling_strategy[cls] = target
@@ -361,35 +431,34 @@ def main():
     X_features, df_fe = feature_engineering(df)
     
     # =========================================================
-    # TENTATIVA 1: Equal-Frequency Binning (qcut)
+    # 1.6 Pré-processamento e Divisão (Equal-Width Binning -- estratégia final)
     # =========================================================
-    print("\n" + "="*50)
-    print("  TENTATIVA 1: EQUAL-FREQUENCY BINNING (qcut)")
-    print("="*50)
-    y_cenario_B = df_fe['target_B'].astype(int)
-    X_train_s, X_val_s, X_test_s, y_train, y_val, y_test = preprocess_and_split(X_features, y_cenario_B)
-    # Nota: aqui a última classe tem ~dobro das instâncias (efeito de teto)
-    print("\n[Tentativa 1] Distribuição do treino por classe:")
-    print(pd.Series(y_train).value_counts().sort_index())
+    # Cenário A: binary (equal-frequency, já balanceado 50/50)
+    y_A = df_fe['target_A'].astype(int)
+    X_train_A, X_val_A, X_test_A, y_train_A, y_val_A, y_test_A = preprocess_and_split(X_features, y_A)
+
+    # Cenário B: 5 classes equal-width
+    y_B = df_fe['target_B_ew'].astype(int)
+    X_train_B, X_val_B, X_test_B, y_train_B, y_val_B, y_test_B = preprocess_and_split(X_features, y_B)
+
+    # Cenário C: 10 classes equal-width
+    y_C = df_fe['target_C_ew'].astype(int)
+    X_train_C, X_val_C, X_test_C, y_train_C, y_val_C, y_test_C = preprocess_and_split(X_features, y_C)
+
+    print("\nDistribuição do treino por classe (Cenário B, equal-width):")
+    print(pd.Series(y_train_B).value_counts().sort_index())
 
     # =========================================================
-    # TENTATIVA 2: Equal-Width Binning (pd.cut) + Oversampling Graduado
+    # 1.7 Oversampling Graduado (Cenários B e C)
     # =========================================================
-    print("\n" + "="*50)
-    print("  TENTATIVA 2: EQUAL-WIDTH BINNING + OVERSAMPLING GRADUADO")
-    print("="*50)
-    y_cenario_B_ew = df_fe['target_B_ew'].astype(int)
-    X_train_ew, X_val_ew, X_test_ew, y_train_ew, y_val_ew, y_test_ew = preprocess_and_split(
-        X_features, y_cenario_B_ew)
+    print("\n--- Cenário B ---")
+    resampled_B = apply_imbalance_strategies(X_train_B, y_train_B, percentages=(5, 10, 20))
+    print("\n--- Cenário C ---")
+    resampled_C = apply_imbalance_strategies(X_train_C, y_train_C, percentages=(5, 10, 20))
 
-    # 1.7 Oversampling graduado: baseline, +5%, +10%, +20%
-    # Treinar modelos com cada versão e comparar resultados (ver relatório)
-    resampled_sets = apply_imbalance_strategies(X_train_ew, y_train_ew,
-                                                percentages=(5, 10, 20))
-
-    print("\nConjuntos disponíveis para treino:")
-    for name, (X_r, y_r) in resampled_sets.items():
-        print(f"  {name}: {len(X_r)} amostras de treino")
+    print("\nConjuntos disponíveis para treino (Cenário B):")
+    for name, (X_r, y_r) in resampled_B.items():
+        print(f"  {name}: {len(X_r)} amostras")
 
     print("\n✅ Pipeline base concluída com sucesso!")
 
