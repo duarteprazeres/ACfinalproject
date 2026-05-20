@@ -22,6 +22,11 @@ except ImportError:
     SMOTE, ADASYN, RandomUnderSampler, ImbPipeline = None, None, None, None
 
 def load_and_inspect_data(filepath):
+    """
+    Carrega o dataset a partir de um ficheiro CSV, inspeciona o seu tamanho, 
+    identifica e remove potenciais colunas irrelevantes (como IDs) e valores duplicados.
+    Também exibe estatísticas descritivas e valores nulos.
+    """
     print("--- 1.1 & 1.2 Importação, Inspecção e Limpeza ---")
     df_original = pd.read_csv(filepath)
     
@@ -52,6 +57,12 @@ def load_and_inspect_data(filepath):
     return df
 
 def generate_targets(df):
+    """
+    Gera as variáveis alvo (targets) para diferentes cenários de classificação:
+    - Cenário A: Classificação binária (Com Stress / Sem Stress).
+    - Cenário B: Classificação em 5 níveis de stress baseados em quantis.
+    - Cenário C: Classificação em 10 níveis de stress (estudo com Equal-Width, Equal-Freq e K-Means).
+    """
     print("\n--- 1.3 Transformação do Target (Cenários A, B e C) ---")
     
     # --- Cenário A ---
@@ -114,6 +125,11 @@ def generate_targets(df):
 
 # 1.4 Análise Exploratória de Dados (EDA)
 def run_eda(df):
+    """
+    Realiza a Análise Exploratória de Dados (EDA) e guarda os gráficos gerados na pasta 'graficos/'.
+    Gera histogramas, gráficos de barras para as classes alvo, matrizes de correlação, 
+    boxplots e pairplots para avaliar a distribuição e relação entre as variáveis.
+    """
     print("\n--- 1.4 Análise Exploratória de Dados (EDA) ---")
     os.makedirs('graficos', exist_ok=True)
     
@@ -210,6 +226,11 @@ def run_eda(df):
 
 # 1.5 Feature Engineering
 def feature_engineering(df):
+    """
+    Cria novas variáveis (features) com base nas existentes para potenciar os modelos preditivos.
+    Calcula rácios (ex: uso de ecrã / sono), interações e variáveis binárias (ex: sedentário).
+    Aplica codificação One-Hot nas variáveis categóricas e remove características altamente correlacionadas.
+    """
     print("\n--- 1.5 Feature Engineering ---")
     df_fe = df.copy()
     epsilon = 1e-5
@@ -256,6 +277,10 @@ def feature_engineering(df):
 
 # 1.6 Pré-processamento Final e Divisão dos Dados
 def preprocess_and_split(X, y):
+    """
+    Divide os dados em conjuntos de Treino (70%), Validação (15%) e Teste (15%) de forma estratificada.
+    Aplica a normalização (StandardScaler) evitando fugas de dados (data leakage), ajustando apenas no treino.
+    """
     print("\n--- 1.6 Pré-processamento e Divisão dos Dados ---")
     
     # Divisão: 70% treino, 15% validação, 15% teste
@@ -309,6 +334,11 @@ def apply_imbalance_strategies(X_train, y_train, percentages=(5, 10, 20)):
     return results
 
 def main():
+    """
+    Função principal que orquestra todo o pipeline de dados:
+    Desde o carregamento do ficheiro até ao tratamento de desequilíbrios,
+    passando por engenharia de features, EDA e divisão dos dados, deixando tudo preparado para a modelação.
+    """
     print("==================================================")
     print("       PIPELINE FINAL COMPLETA (1.1 a 1.7)      ")
     print("==================================================")

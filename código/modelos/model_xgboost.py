@@ -52,14 +52,28 @@ from data_pipeline import load_and_inspect_data, generate_targets, feature_engin
 # HELPERS
 # =============================================================
 def _xgb_objective(n_classes):
+    """
+    Define a função objetivo do XGBoost consoante o cenário.
+    Usa 'binary:logistic' para classificação binária (Cenário A) e 
+    'multi:softprob' para classificação multiclasse (Cenários B e C).
+    """
     return 'binary:logistic' if n_classes == 2 else 'multi:softprob'
 
 
 def _xgb_metric(n_classes):
+    """
+    Define a métrica de avaliação interna do XGBoost consoante o cenário.
+    Usa 'logloss' para binário e 'mlogloss' para multiclasse.
+    """
     return 'logloss' if n_classes == 2 else 'mlogloss'
 
 
 def _build_xgb(n_classes, **kwargs):
+    """
+    Inicializa o classificador XGBoost com as definições base.
+    Utiliza todos os núcleos disponíveis (n_jobs=-1) e aplica um estado aleatório fixo (RANDOM_STATE)
+    para garantir a reprodutibilidade dos resultados.
+    """
     return xgb.XGBClassifier(
         objective=_xgb_objective(n_classes),
         eval_metric=_xgb_metric(n_classes),
@@ -74,6 +88,12 @@ def _build_xgb(n_classes, **kwargs):
 # BASELINE
 # =============================================================
 def train_xgb_baseline(X_train, y_train, X_val, y_val, scenario):
+    """
+    Treina e avalia o XGBoost com uma configuração base (Baseline).
+    Efetua a codificação das labels (LabelEncoder), aplica pesos para classes desequilibradas
+    (compute_sample_weight) e usa o conjunto de validação para monitorizar o treino.
+    Retorna o modelo, o codificador e as métricas.
+    """
     print(f"\n  [XGBoost Baseline] Cenário {scenario}")
     n_cls = len(np.unique(y_train))
 
@@ -107,13 +127,10 @@ def train_xgb_baseline(X_train, y_train, X_val, y_val, scenario):
 # =============================================================
 def tune_xgb(X_train, y_train, X_val, y_val, scenario):
     """
-    RandomizedSearchCV (20 iterações) sobre:
-      n_estimators      ∈ {100, 200, 300}       — número de árvores
-      max_depth         ∈ {3, 5, 7}             — profundidade máxima das árvores
-      learning_rate     ∈ {0.01, 0.05, 0.1, 0.2}— passo de actualização
-      subsample         ∈ {0.7, 0.8, 1.0}       — fracção de amostras por árvore
-      colsample_bytree  ∈ {0.7, 0.8, 1.0}       — fracção de features por árvore
-      min_child_weight  ∈ {1, 3, 5}             — peso mínimo em folha (regularização)
+    Optimiza os hiperparâmetros do XGBoost com RandomizedSearchCV.
+    Explora 20 combinações variando o número de árvores, profundidade, learning rate, subsample, etc.
+    Inclui balanceamento de pesos para combater desequilíbrios.
+    Retorna o melhor modelo otimizado, o codificador de labels e guarda os gráficos resultantes.
     """
     print(f"\n  [XGBoost RandomizedSearchCV] Cenário {scenario}")
     n_cls = len(np.unique(y_train))
@@ -157,6 +174,11 @@ def tune_xgb(X_train, y_train, X_val, y_val, scenario):
 # CV BASELINE
 # =============================================================
 def run_cv_baseline(X_raw, y, scenario, cv_rows):
+    """
+    Executa validação cruzada (Cross-Validation) num modelo XGBoost mais simples (menos árvores)
+    para obter a métrica base média (F1-macro) em todos os dados de forma robusta,
+    antes de se aplicar a otimização de parâmetros.
+    """
     n_cls  = len(np.unique(y))
     le     = LabelEncoder()
     y_enc  = le.fit_transform(y)
@@ -176,6 +198,13 @@ def run_cv_baseline(X_raw, y, scenario, cv_rows):
 # MAIN
 # =============================================================
 def main():
+    """
+    Função principal que orquestra todo o pipeline do XGBoost:
+    1. Carrega e limpa os dados.
+    2. Calcula as métricas em validação cruzada.
+    3. Treina o baseline, otimiza hiperparâmetros, avalia no conjunto de validação
+       e guarda os ficheiros .pkl (modelo e codificador) para os três cenários.
+    """
     print("=" * 60)
     print("   MODEL_XGBOOST.PY — XGBoost Gradient Boosting")
     print("=" * 60)
