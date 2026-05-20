@@ -61,99 +61,72 @@ formato, decidimos atacá-lo sob três perspetivas de complexidade crescente:
 
 \begin{itemize}
   \item \textbf{Cenário A} -- Classificação binária: \textit{sem stress} (0) vs \textit{com stress} (1);
-  \item \textbf{Cenário B} -- 5 classes: Sem stress, Baixo, Moderado, Alto, Extremo;
-  \item \textbf{Cenário C} -- 10 classes: escala granular Nível 0 a Nível 9.
+  \item \textbf{Cenário B} -- 5 classes (ver §\ref{sec:targets} para o processo de discretização);
+  \item \textbf{Cenário C} -- 10 classes (ver §\ref{sec:targets} para o processo de discretização).
 \end{itemize}
 
 Esta estrutura em três cenários permitiu-nos não só avaliar o desempenho dos modelos, mas
-também estudar como a complexidade do problema de classificação afeta os resultados -- algo
-que raramente encontrámos abordado de forma sistemática na literatura.
+também estudar como a complexidade do problema de classificação afeta os resultados.
 
 Para cobrir diferentes paradigmas de aprendizagem automática, escolhemos três modelos:
-\textbf{SVM}, \textbf{Rede Neuronal (MLP)} e \textbf{XGBoost}. Avaliámo-los com validação
-cruzada estratificada, otimização sistemática de hiperparâmetros e testes de significância
-estatística, para garantir que as conclusões fossem robustas e não produto do acaso.
-Os principais resultados que obtivemos foram F1 macro de $\approx$0.95 (Cenário A),
-$\approx$0.82 (Cenário B) e $\approx$0.58 (Cenário C).
+\textbf{SVM}, \textbf{Rede Neuronal (MLP)} e \textbf{XGBoost}. Avaliámo-los com
+\textbf{validação cruzada estratificada} (uma técnica que divide os dados em vários
+subconjuntos e treina/avalia o modelo em rotação, dando estimativas de desempenho mais
+fiáveis do que uma divisão única), com \textbf{otimização de hiperparâmetros} (ajuste
+sistemático dos parâmetros de configuração de cada modelo para encontrar a melhor
+combinação possível) e com \textbf{testes de significância estatística} (verificação
+formal de que as diferenças observadas entre modelos não são produto do acaso).
+O desempenho é reportado em \textbf{F1 macro} -- uma métrica que mede a qualidade das
+previsões tratando todas as classes de forma igualitária, independentemente da sua
+frequência. Os principais resultados que obtivemos foram F1 macro de $\approx$0.95
+(Cenário A), $\approx$0.82 (Cenário B) e $\approx$0.58 (Cenário C).
 
 %=============================================================
 \section{Background}
 %=============================================================
 
-Antes de começarmos a modelar, considerámos importante perceber o que outros investigadores
-e a comunidade Kaggle já tinham feito sobre este problema ou problemas semelhantes.
-Queríamos dois tipos de informação: referências metodológicas que nos ajudassem a tomar
-decisões mais informadas, e resultados de comparação que nos permitissem avaliar a qualidade
-do que iriamos produzir.
+Antes de começarmos, consultámos brevemente o que tinha sido feito sobre este tema,
+tanto na plataforma Kaggle como na literatura académica, para ter uma referência
+do ponto de partida.
 
 \subsection{Trabalhos na Plataforma Kaggle}
 
-Para contextualizar e comparar o nosso trabalho, começámos por explorar a secção
-\textit{Code} do próprio dataset no Kaggle, onde a comunidade publica notebooks
-com análises independentes sobre os mesmos dados.
-
-O trabalho de Badrnezhad \cite{badrnezhad2024} foi o primeiro que analisámos em detalhe,
-por desenvolver um pipeline ETL completo sobre um dataset estruturalmente idêntico ao
-nosso. O que nos pareceu mais relevante é que este trabalho se ficou pela limpeza de dados
-e análise exploratória, sem avançar para modelação preditiva -- o que nos motivou a ir
-mais longe e a perceber que havia espaço para construir e avaliar modelos de classificação
-robustos sobre estes dados.
-
-Analisámos igualmente o trabalho de Tolstoyj \cite{tolstoyj2024}, que utilizou
-\textit{Random Forest} em modo de \textbf{regressão} sobre dados sintéticos do mesmo
-tipo (sono, tempo de ecrã, stress). A conclusão reportada foi que ``as correlações iniciais
-entre as variáveis comportamentais e o nível de stress são fracas'', o que nos levou a
-questionar se a fraqueza do sinal se devia à abordagem de regressão ou ao dataset em si.
-Decidimos então adotar uma estratégia de \textbf{classificação} com discretização
-explícita da variável-alvo em vez de regressão direta -- e os resultados que obtivemos
-confirmaram que esta foi a decisão correta: com F1 macro de $\approx$0.95 no Cenário A,
-o sinal preditivo é claramente mais rico do que o sugerido por uma abordagem regressiva.
+Na secção \textit{Code} do dataset no Kaggle encontrámos dois notebooks relevantes.
+Badrnezhad \cite{badrnezhad2024} desenvolveu um pipeline de preparação de dados
+(\textit{ETL}) sobre as mesmas variáveis que o nosso dataset contém, sem avançar
+para modelação preditiva. Tolstoyj \cite{tolstoyj2024} aplicou \textit{Random Forest}
+em modo de \textbf{regressão} sobre dados semelhantes (sono, ecrã, stress), concluindo
+que as relações entre as variáveis comportamentais e o nível de stress eram fracas.
 
 \subsection{Literatura Académica Relacionada}
 
-Além dos trabalhos na plataforma Kaggle, decidimos ir mais longe e fazer uma pesquisa de papers e obras na literatura
-académica para perceber o estado da arte em problemas semelhantes. Contudo, esta tarefa é difícil e demorada pois exige muito tempo a investigar ao pormenor imensos trabalhos
-de variadas fontes. Por isso, para otimizar o nosso tempo e para concentrar mais esforços nas tarefas seguintes do trabalho, decidimos recorrer a um agente de inteligência artificial corrido sobre o modelo
-Sonnet 4.7 da Claude (Anthropic) para nos ajudou a encontrar e explicar os principais trabalhos relacionados com o nosso problema:
+Para investigar a literatura científica relevante sobre a classificação de stress 
+e perturbações do sono, recorreu-se a um agente autónomo de inteligência artificial. 
+Esta metodologia permitiu realizar uma pesquisa abrangente e profunda em diversas bases
+de dados e fontes digitais, superando barreiras linguísticas e identificando 
+estudos que, de outra forma, poderiam não ser mapeados. 
+Adicionalmente, a automatização desta etapa otimizou significativamente o tempo de 
+computação e pesquisa em comparação com uma revisão manual, viabilizando uma alocação 
+mais eficiente de recursos e tempo para as fases subsequentes e nucleares do projeto.
 
-\textbf{Classificação de distúrbios do sono e stress:}
-Encontrámos um estudo de Huang et al.\ \cite{huang2024} que nos pareceu particularmente
-relevante por ter utilizado features muito sobreponíveis às nossas (duração do sono,
-qualidade, nível de stress, IMC). Os autores compararam seis algoritmos -- Random Forest,
-Árvore de Decisão, SVM, KNN, XGBoost e ANN -- e concluíram que o \textbf{XGBoost obteve
-a melhor accuracy de 90.66\%}. Esta descoberta pesou na nossa decisão de incluir o XGBoost
-como terceiro modelo obrigatório, e os nossos resultados acabaram por confirmar o seu valor.
+Como resultado, a nossa pesquisa encontrou três trabalhos particularmente interessantes:
+\begin{itemize}
+  \item Huang et al.\ \cite{huang2024} compararam seis algoritmos de ML (incluindo SVM,
+    XGBoost e ANN) em dados de sono e saúde, reportando \textbf{XGBoost} como o melhor
+    com 90.66\% de accuracy;
+  \item Lei et al.\ \cite{lei2024} usaram \textit{Random Forest} para classificação
+    binária de stress a partir de dados de sono, obtendo F1 = 0.98;
+  \item Acosta et al.\ \cite{acosta2025} utilizaram sensores físicos acoplados ao corpo
+    (frequência cardíaca, temperatura, saturação de oxigénio) para prever stress durante
+    o sono, com todos os classificadores a superar 98\% de accuracy.
+\end{itemize}
 
-\textbf{Previsão de stress em padrões de sono:}
-Deparámo-nos também com o trabalho de Lei et al.\ \cite{lei2024}, que usaram Random Forest
-para classificação binária de stress a partir de dados de sono, reportando um F1-Score de
-98\%. O valor é superior ao que obtivemos ($\approx$0.95), mas percebemos que isso se deve
-à maior simplicidade do dataset deles -- com padrões de sono mais diferenciados e sem
-o ruído adicional das variáveis de tempo de ecrã. Esta comparação ajudou-nos a calibrar
-as expectativas e a perceber que os nossos resultados são, de facto, competitivos
-dado o contexto mais exigente do dataset que utilizámos.
-
-\textbf{Classificação de stress com sinais fisiológicos:}
-Por curiosidade, analisámos também um trabalho com dados de sensores biométricos IoMT
-recolhidos durante o sono \cite{acosta2025}, onde todos os classificadores testados
-superaram 0.98 de accuracy. Percebemos rapidamente que este contexto é fundamentalmente
-diferente do nosso: sinais fisiológicos contínuos são muito mais discriminativos do que
-dados comportamentais sintéticos, pelo que não seria realista esperar resultados semelhantes.
-Esta distinção foi útil para enquadrar as limitações do nosso trabalho.
-
-\subsection{Posicionamento deste Trabalho}
-
-Depois de consolidar esta revisão, ficou-nos claro onde o nosso trabalho se posiciona.
-A Tabela~\ref{tab:background_comp} resume as principais diferenças e compara os resultados.
-Identificámos também um gap claro na literatura: nenhum dos trabalhos que analisámos
-aborda a classificação de stress com 5 ou 10 classes de forma sistemática -- todos se
-focam na classificação binária. Esta lacuna constituiu uma motivação adicional para manter
-os três cenários no nosso projeto, tornando-o uma contribuição mais diferenciada.
+A Tabela~\ref{tab:background_comp} resume estes trabalhos para referência.
 
 \begin{table}[H]
 \centering
 \small
-\caption{Comparação com trabalhos relacionados (classificação binária).}
+\caption{Resumo dos trabalhos consultados (resultados em classificação binária).}
 \label{tab:background_comp}
 \begin{tabular}{p{3.5cm}p{3cm}p{2.5cm}cc}
 \toprule
@@ -161,15 +134,10 @@ os três cenários no nosso projeto, tornando-o uma contribuição mais diferenc
 \midrule
 Lei et al. \cite{lei2024}        & Kaggle (sono sintético) & Random Forest  & --      & 0.98  \\
 Huang et al. \cite{huang2024}    & Kaggle (saúde/sono)     & XGBoost        & 90.66\% & --    \\
-Acosta et al. \cite{acosta2025}  & IoMT biosensores        & Ensemble       & $>$98\% & --    \\
-\textbf{Este trabalho (Cen.~A)}  & \textbf{Kaggle (sintét.)} & \textbf{NN/MLP} & \textbf{95.02\%} & \textbf{0.9502} \\
+Acosta et al. \cite{acosta2025}  & Biosensores físicos     & Ensemble       & $>$98\% & --    \\
 \bottomrule
 \end{tabular}
 \end{table}
-
-Os resultados que alcançámos para o Cenário A (F1 $\approx$ 0.95) são comparáveis à
-literatura para dados sintéticos comportamentais, com uma metodologia mais abrangente
-do que a maioria dos trabalhos consultados (3 modelos, 3 cenários, testes estatísticos).
 
 %=============================================================
 \section{Dataset e Análise Exploratória}
@@ -187,18 +155,58 @@ de classificação.
 
 \subsection{Limpeza e Qualidade dos Dados}
 
-Antes de avançarmos para qualquer análise, fizemos uma verificação cuidadosa da qualidade
-dos dados. O resultado foi encorajador:
-\begin{itemize}
-  \item \textbf{Valores nulos}: não encontrámos nenhum em nenhuma coluna, pelo que não
-    foi necessário imputar nem remover registos;
-  \item \textbf{Duplicados}: não detetámos nenhum registo duplicado;
-  \item \textbf{Colunas irrelevantes}: identificámos a coluna \texttt{user\_id} como um
-    identificador sem valor preditivo e excluímo-la antes de qualquer processamento.
-\end{itemize}
+Antes de avançarmos para a análise, verificámos a qualidade dos dados: não encontrámos
+valores nulos nem registos duplicados, e removemos a coluna \texttt{user\_id} por ser
+um identificador sem valor preditivo. O dataset estava limpo à partida, o que é típico
+de dados sintéticos.
 
-No fundo, o dataset estava bastante limpo, o que nos permitiu focar o esforço nas etapas
-mais interessantes do projeto: a engenharia de features e a modelação.
+\subsection{Transformação do Target}
+\label{sec:targets}
+
+Uma das primeiras decisões que tivemos de tomar foi como transformar a variável contínua
+\texttt{stress\_level} em classes discretas para cada cenário. O processo não foi linear
+-- passámos por duas estratégias de discretização, sendo que os resultados da primeira
+motivaram a adoção da segunda.
+
+\textbf{Cenário A (2 Classes)}: Aqui não houve iteração. Usámos \textit{equal-frequency
+binning} com ponto de corte na mediana ($7.38$), obtendo duas classes equilibradas
+``Sem Stress'' (0) e ``Com Stress'' (1) com distribuição $\approx$50/50.
+
+\medskip
+\noindent\textbf{Cenários B e C -- Tentativa 1: Equal-Frequency Binning}
+
+O plano inicial para os Cenários B e C era usar também \textit{equal-frequency binning}
+(\texttt{pd.qcut}): dividir os dados em 5 quantis para o Cenário B e em 10 quantis para
+o Cenário C, garantindo assim aproximadamente o mesmo número de instâncias por classe.
+Ao executar o algoritmo, contudo, deparámo-nos com um problema inesperado: mais de 20\%
+dos registos têm \texttt{stress\_level} = 10.0 (o valor máximo do dataset). Isto faz
+com que o 80.º percentil já seja 10.0 -- o mesmo que o máximo absoluto. As fronteiras
+do 4.º e 5.º bin do Cenário B tornaram-se idênticas e o algoritmo, ao detetar esta
+duplicação, fundiu os dois bins superiores num só. No Cenário C, os percentis 80, 90 e
+100 coincidem em 10.0, fundindo três bins. O resultado foi \textbf{4 classes efetivas}
+em vez de 5 no Cenário B, e \textbf{8 classes efetivas} em vez de 10 no Cenário C.
+
+\medskip
+\noindent\textbf{Cenários B e C -- Tentativa 2: Equal-Width Binning + Oversampling}
+
+Perante este resultado, decidimos mudar de estratégia. Em vez de garantir contagens
+iguais por classe (equal-frequency), passámos a garantir \textbf{intervalos de valores
+iguais} entre classes (\textit{equal-width binning}, \texttt{pd.cut}): o intervalo de
+valores do \texttt{stress\_level} é dividido em partes iguais, independentemente de
+quantas instâncias caem em cada parte. Esta abordagem cria \textbf{exatamente 5 classes}
+no Cenário B e \textbf{exatamente 10 classes} no Cenário C, como o enunciado prevê.
+
+A contrapartida é um desequilíbrio de classes mais acentuado: a última classe
+(valores próximos de 10.0) concentra uma proporção significativamente maior de instâncias
+do que as restantes, devido precisamente ao efeito de teto do dataset. Para compensar,
+aplicámos \textbf{SMOTE} (\textit{Synthetic Minority Oversampling Technique}) ao
+conjunto de treino: o algoritmo gera instâncias sintéticas para as classes minoritárias
+por interpolação entre exemplos existentes, equilibrando a distribuição sem descartar
+dados reais. O SMOTE é aplicado \textit{apenas ao conjunto de treino}, depois da divisão
+treino/validação/teste, para evitar \textit{data leakage}.
+
+Os resultados desta secção relatam esta segunda estratégia (equal-width + SMOTE),
+que garante o número de classes pedido no enunciado.
 
 \subsection{Visualizações EDA}
 
@@ -209,21 +217,47 @@ o stress? e as classes que criámos estão razoavelmente equilibradas?
 
 Começámos pelas distribuições univariadas de cada variável numérica (Figura abaixo),
 que nos deram uma primeira ideia da forma geral dos dados e de eventuais assimetrias.
+A linha curva sobreposta a cada histograma é a \textbf{curva KDE} (\textit{Kernel
+Density Estimate}): uma estimativa suavizada da forma da distribuição, que ajuda a
+perceber o padrão geral independentemente do tamanho dos intervalos do histograma.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.95\textwidth]{../graficos/eda_distribuicoes.png}
-  \caption{Distribuições univariadas das variáveis numéricas.}
+  \caption{Distribuições univariadas das variáveis numéricas (barras = histograma;
+    linha = KDE suavizado).}
 \end{figure}
 
-Ao analisar os histogramas, verificámos que a maioria das variáveis numéricas apresenta
-distribuições aproximadamente normais ou uniformes -- comportamento esperado num dataset
-sintético. A ausência de assimetrias extremas e de outliers severos confirmou-nos que
-não seria necessária qualquer transformação logarítmica ou remoção de anomalias. Notámos
-que o \texttt{mental\_fatigue\_score} apresenta uma distribuição mais concentrada e
-simétrica, enquanto variáveis como \texttt{physical\_activity\_minutes} e
-\texttt{caffeine\_intake\_cups} mostram maior dispersão -- detalhe que se revelaria
-relevante na análise de correlação.
+Ao analisar os histogramas, observámos dois fenómenos que consideramos relevantes.
+
+\begin{sloppypar}
+O primeiro é um \textbf{efeito de teto} (\textit{ceiling effect}) em duas variáveis:
+\texttt{mental\_fatigue\_score} e \texttt{stress\_level}.
+Em ambas, a última barra (valor~10) é claramente a maior. No caso desta variável,
+o intervalo (9,~10] concentra 4742 registos, mais do dobro do segundo maior intervalo.
+Esta concentração no valor máximo não é um outlier isolado mas sim um artefacto típico
+de dados sintéticos, onde a função geradora pode acumular observações nos limites do
+intervalo definido.
+\end{sloppypar}
+
+O segundo fenómeno diz respeito ao \texttt{caffeine\_intake\_cups}. Ao observar o
+histograma, pode parecer que existem valores fracionados como 0.5 ou 1.5 chávenas
+-- o que não faz sentido na realidade. Verificámos os dados e confirmámos que todos os
+valores são inteiros (0, 1, 2, 3 e 4 chávenas). O que aparece no histograma original
+são \textbf{artefactos visuais}: quando o \texttt{histplot} divide o eixo em intervalos
+automáticos, pode criar barras entre inteiros, e a curva KDE suaviza a distribuição
+introduzindo valores intermediários. Para ter uma leitura mais correta desta variável,
+criámos uma segunda visualização com bins discretos:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{../graficos/eda_caffeine_discrete.png}
+  \caption{Distribuição de \texttt{caffeine\_intake\_cups}: visualização original com
+    bins contínuos (esquerda) vs.\ visualização corrigida com bins inteiros (direita).
+    Os dados são apenas inteiros (0--4); as barras a 0.5 e 1.5 na figura da esquerda
+    são artefactos do histograma automático e da curva KDE.}
+\end{figure}
+
 
 De seguida, construímos dois heatmaps de correlação complementares: um de
 \textbf{Pearson} e outro de \textbf{Spearman}. A razão para usarmos as duas métricas
@@ -236,10 +270,7 @@ as relações têm uma componente não-linear significativa.
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{../graficos/eda_correlacao_combined.png}
-  \caption{Heatmaps de correlação de Pearson (esquerda) e Spearman (direita).
-    Os três preditores dominantes são os mesmos em ambas as métricas, mas
-    \texttt{sleep\_quality\_score} e \texttt{daily\_screen\_time\_hours}
-    mostram correlação de Spearman ligeiramente superior.}
+  \caption{Heatmaps de correlação de Pearson (esquerda) e Spearman (direita).}
 \end{figure}
 
 A comparação dos dois heatmaps revelou dois resultados que consideramos importantes.
@@ -252,50 +283,74 @@ com valores muito próximos entre si:
 \end{itemize}
 Em segundo lugar, e mais interessante, \texttt{daily\_screen\_time\_hours} e
 \texttt{sleep\_quality\_score} apresentam correlação de Spearman \textit{ligeiramente
-superior} à de Pearson -- sinal de que estas relações têm uma componente monotónica
-não-linear que a Pearson não captura completamente. Pelo contrário, para o
-\texttt{mental\_fatigue\_score} a diferença é quase nula, sugerindo uma relação
-predominantemente linear com o stress. Surpreendeu-nos também verificar que variáveis
+superior} à de Pearson. O que isto significa na prática é que a relação entre estas
+variáveis e o stress não é perfeitamente proporcional (o que seria uma relação linear),
+mas cresce de forma monotónica -- por exemplo, mais tempo de ecrã \textit{tende sempre}
+a corresponder a mais stress, mas o efeito de cada hora adicional pode não ser sempre o
+mesmo (pode ser maior no início e menor depois de certo ponto, como uma curva logarítmica).
+Esta descoberta sugere que modelos capazes de aprender fronteiras não-lineares -- como
+o kernel RBF do SVM ou as árvores do XGBoost -- têm uma vantagem natural neste dataset.
+Para o \texttt{mental\_fatigue\_score}, a diferença entre Pearson e Spearman é quase
+nula, o que indica uma relação mais diretamente proporcional com o stress. Surpreendeu-nos também verificar que variáveis
 como a atividade física, a duração do sono e o consumo de cafeína apresentam correlações
-próximas de zero em ambas as métricas -- confirmando que o sinal preditivo do dataset
-se concentra nas três variáveis-chave acima, algo que influenciou diretamente a nossa
-estratégia de feature engineering.
+próximas de zero em ambas as métricas -- confirmando que a capacidade preditiva do
+dataset está essencialmente concentrada nas três variáveis-chave acima, algo que
+influenciou diretamente a nossa estratégia de feature engineering.
 
-Verificámos também a distribuição dos targets que criámos para cada cenário, para garantir
-que o processo de discretização não gerou classes extremamente desequilibradas.
+Verificámos a distribuição dos targets produzidos por cada estratégia de discretização,
+o que foi determinante para a decisão de mudar de abordagem.
+
+\paragraph{Tentativa 1 (Equal-Frequency).}
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.95\textwidth]{../graficos/eda_targets.png}
-  \caption{Distribuição dos targets nos Cenários A, B e C após discretização.}
+  \caption{Tentativa 1 -- Distribuição dos targets com \textit{equal-frequency binning}.
+    Cenário B resultou em 4 classes efetivas (planeadas 5); Cenário C resultou em 8
+    classes efetivas (planeadas 10).}
 \end{figure}
 
-O gráfico confirma que o \textit{equal-frequency binning} atingiu o objetivo pretendido:
-as classes estão aproximadamente equilibradas em todos os cenários -- 50/50 no Cenário A,
-$\approx$20\% por classe no Cenário B e $\approx$10\% por classe no Cenário C. Este
-equilíbrio é fundamental para que o F1 macro seja uma métrica justa: com classes
-desequilibradas, um modelo que ignorasse as classes minoritárias ainda assim obteria
-accuracy elevada, tornando a avaliação enganadora. Ao garantir o equilíbrio à partida,
-evitámos este problema e tornámos a comparação entre cenários mais honesta.
+O gráfico evidencia o problema da Tentativa 1. No Cenário A o split é 50/50, como
+esperado. Nos Cenários B e C, contudo, a \textbf{última classe é notoriamente maior}:
+no Cenário B a classe 3 tem $\approx$6000 instâncias (o dobro das restantes) e no
+Cenário C a classe 7 tem $\approx$4500 (o triplo). A causa é o \textbf{efeito de teto}
+do dataset: mais de 20\% dos registos têm \texttt{stress\_level} = 10.0, o que faz
+com que o 80.º percentil já seja o valor máximo. As fronteiras superiores dos bins
+coincidem, o algoritmo deteta a duplicação e funde os bins -- resultando em 4 e 8
+classes efetivas em vez das 5 e 10 planeadas. Este resultado motivou a Tentativa 2.
 
-Complementámos com um box plot da variável mais correlacionada por classe no Cenário B,
-que confirmou visualmente que as classes têm distribuições diferentes e que, portanto,
-o problema de classificação tem sinal preditivo real.
+\paragraph{Tentativa 2 (Equal-Width).}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{../graficos/eda_targets_ew.png}
+  \caption{Tentativa 2 -- Distribuição dos targets com \textit{equal-width binning}.
+    Cenário B com exatamente 5 classes; Cenário C com exatamente 10 classes.}
+\end{figure}
+
+Com equal-width binning obtemos exatamente as 5 e 10 classes previstas no enunciado.
+O desequilíbrio persiste -- a última classe continua com mais instâncias do que as
+restantes, reflexo do efeito de teto -- mas agora é gerido por SMOTE aplicado ao
+conjunto de treino (descrito em §\ref{sec:imbalance}), em vez de por fusão de bins.
+Esta abordagem preserva a granularidade pedida.
+
+Complementámos com um box plot do \texttt{mental\_fatigue\_score} (o preditor mais
+correlacionado com o stress) por classe no Cenário B, para confirmar visualmente se
+as classes têm distribuições distintas.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.7\textwidth]{../graficos/eda_boxplot.png}
-  \caption{Box plot da variável mais correlacionada por classe (Cenário B).}
+  \caption{Box plot do \texttt{mental\_fatigue\_score} por classe (Cenário B).}
 \end{figure}
 
 O box plot confirma aquilo que a análise de correlação já antecipava: há uma separação
-clara e progressiva das medianas da variável mais correlacionada ao longo das 5 classes
-do Cenário B. As classes extremas (0 e 4) têm distribuições bem separadas com sobreposição
-mínima entre si, enquanto as classes intermédias (1, 2 e 3) apresentam intervalos
-interquartis com maior sobreposição mútua. Esta observação antecipou um padrão que
-depois confirmámos nas matrizes de confusão: os modelos distinguem bem os extremos,
-mas têm maior dificuldade nas classes intermédias -- o que é semanticamente coerente,
-pois a diferença comportamental entre stress ``baixo'' e ``moderado'' é genuinamente subtil.
+clara e progressiva das medianas do \texttt{mental\_fatigue\_score} ao longo das classes
+do Cenário B -- de baixo stress (classe 0, fadiga baixa) para stress máximo (última
+classe, fadiga alta). As classes extremas têm distribuições bem separadas,
+enquanto as classes intermédias (1 e 2) apresentam sobreposição maior entre si. Este
+padrão antecipou exatamente o que depois observámos nas matrizes de confusão: os modelos
+distinguem bem os extremos mas confundem-se nas classes intermédias.
 
 Por fim, gerámos um pairplot das três features mais correlacionadas com o stress para
 visualizar as relações entre pares de variáveis e avaliar a separabilidade visual
@@ -315,36 +370,12 @@ extremas (coloração mais escura vs.\ mais clara) tendem a ocupar regiões dist
 do espaço de features. Nas distribuições diagonais (KDE por classe), as classes
 intermédias sobrepõem-se significativamente entre si, mas distinguem-se das extremas.
 Ficámos satisfeitos com este resultado: a separabilidade visual, ainda que imperfeita,
-confirmou-nos que os modelos teriam sinal suficiente para aprender -- e ajudou-nos a
-calibrar as expectativas de desempenho antes de avançar para a modelação.
+confirmou-nos que os modelos teriam informação suficiente para aprender -- e ajudou-nos
+a calibrar as expectativas de desempenho antes de avançar para a modelação.
 
 %=============================================================
 \section{Metodologia}
 %=============================================================
-
-\subsection{Transformação do Target}
-
-Uma das primeiras decisões que tivemos de tomar foi como transformar a variável contínua
-\texttt{stress\_level} em classes discretas para cada cenário. Não existe uma única forma
-correta de o fazer, por isso avaliámos diferentes abordagens e justificámos cada escolha:
-
-\begin{itemize}
-  \item \textbf{Cenário A (2 Classes)}: Optámos por \textit{equal-frequency binning}
-    com ponto de corte na mediana ($7.38$), obtendo duas classes equilibradas
-    ``Sem Stress'' (0) e ``Com Stress'' (1). A razão principal foi o equilíbrio resultante
-    ($\approx$50/50): com classes balanceadas, os modelos não ficam tendenciosos para a
-    classe maioritária, o que simplifica a avaliação.
-  \item \textbf{Cenário B (5 Classes)}: Escolhemos \textbf{Equal-Frequency Binning} em
-    5 quantis (Sem stress, Baixo, Moderado, Alto, Extremo). A lógica foi a mesma: ao
-    garantir que cada classe tem exatamente o mesmo número de instâncias, evitámos classes
-    esparsas que tornariam a aprendizagem injusta para os modelos.
-  \item \textbf{Cenário C (10 Classes)}: Aqui experimentámos e comparámos explicitamente
-    três métodos -- Equal-Width, Equal-Frequency e K-Means -- antes de decidir.
-    Acabámos por escolher \textbf{Equal-Frequency} pelos mesmos motivos do Cenário B.
-    Reconhecemos, porém, a principal fraqueza desta escolha: a sobreposição semântica
-    entre classes adjacentes (a diferença de stress entre nível 4 e nível 5 é muito
-    pequena) cria fronteiras artificiais que dificultam a tarefa dos modelos.
-\end{itemize}
 
 \subsection{Feature Engineering}
 
@@ -382,8 +413,11 @@ Para validar as nossas escolhas, corremos uma avaliação de importância prelim
 Random Forest simples e confirmámos que as features com correlação cruzada $>0.95$ seriam
 eliminadas automaticamente. A Figura~\ref{fig:feat_imp} confirma que o
 \texttt{mental\_fatigue\_score} e o \texttt{daily\_screen\_time\_hours} continuam a ser
-os preditores dominantes -- o que nos deu confiança de que o dataset tem sinal preditivo
-real e de que as nossas features adicionais contribuem, ainda que marginalmente.
+os preditores dominantes -- o que nos deu confiança de que o dataset tem informação
+preditiva real. As features que criámos (\texttt{ratio\_usage\_sleep} e
+\texttt{ratio\_activity\_usage}) aparecem com alguma importância, mas inferior
+à das três variáveis originais dominantes -- ou seja, contribuem, mas não são as
+que mais pesam nas decisões do modelo.
 
 \begin{figure}[H]
   \centering
@@ -400,8 +434,8 @@ Mais encorajador ainda, os rácios que criámos -- \texttt{ratio\_usage\_sleep} 
 \texttt{ratio\_activity\_usage} -- aparecem com importância não nula, validando a
 nossa decisão de os criar. As features com importância próxima de zero, como
 \texttt{caffeine\_intake\_cups} ou \texttt{age}, confirmam o que as correlações de Pearson
-e Spearman já tinham revelado: neste dataset sintético, o sinal preditivo concentra-se
-em três variáveis-chave, sendo as restantes maioritariamente ruidosas.
+e Spearman já tinham revelado: neste dataset sintético, a capacidade preditiva concentra-se
+em três variáveis-chave, sendo as restantes maioritariamente sem poder discriminativo.
 
 \subsection{Pré-processamento}
 
@@ -421,33 +455,48 @@ cruzada seja justa e representativa.
 \subsubsection{Normalização e Prevenção de Data Leakage}
 
 Decidimos normalizar todas as features com \texttt{StandardScaler}, porque modelos como
-o SVM são muito sensíveis à escala das variáveis e a sua performance degrada drasticamente
-sem normalização. O passo crítico foi garantir que o scaler era \textit{exclusivamente}
+o SVM são muito sensíveis à escala das variáveis e a sua performance diminui
+significativamente sem normalização. O passo crítico foi garantir que o scaler era \textit{exclusivamente}
 calculado sobre os dados de treino (\texttt{fit\_transform}) e apenas aplicado -- sem
 recalcular -- nos conjuntos de validação e teste (\texttt{transform}). Fizemo-lo assim
 para evitar \textit{data leakage}: se calculássemos a média e o desvio padrão com base
-em todos os dados incluindo o teste, estaríamos a dar ao modelo informação sobre dados
-que ainda não deveria ter visto, inflacionando artificialmente a performance. Para reforçar
+em todos os dados incluindo validação e teste, estaríamos a dar ao modelo informação
+sobre dados que ainda não deveria ter visto, inflacionando artificialmente a performance. Para reforçar
 esta proteção durante a validação cruzada, encapsulámos o scaler num \texttt{Pipeline}
 do scikit-learn, que repete automaticamente este processo correto em cada fold.
 
 \subsubsection{Lidar com o Desequilíbrio de Classes}
+\label{sec:imbalance}
 
-Nos Cenários B e C, confrontámo-nos com o problema do desequilíbrio entre classes.
-Experimentámos três abordagens diferentes antes de tomar uma decisão:
-\begin{itemize}
-  \item \textbf{SMOTE e ADASYN (Oversampling)}: geram instâncias sintéticas para
-    aumentar as classes minoritárias -- testámos, mas optámos por não usar porque
-    alteram a distribuição original dos dados;
-  \item \textbf{RandomUnderSampler}: elimina instâncias das classes maioritárias --
-    descartámos porque resulta em perda de informação relevante;
-  \item \textbf{Ponderação interna dos modelos}: a abordagem que acabámos por escolher.
-    Usámos \texttt{class\_weight} e \texttt{sample\_weight} com o valor
-    \texttt{'balanced'} no SVM e XGBoost respetivamente, penalizando mais os erros
-    nas classes sub-representadas sem alterar os dados originais.
-\end{itemize}
-A nossa preferência pela ponderação interna deveu-se precisamente a esta vantagem:
-preserva a distribuição real dos dados, tornando a avaliação mais honesta.
+Nos Cenários B e C, a última classe concentra mais instâncias do que as restantes
+devido ao efeito de teto do dataset. A estratégia para lidar com este desequilíbrio
+evoluiu em paralelo com a estratégia de discretização.
+
+\textbf{Na Tentativa 1 (equal-frequency)}, como a última classe agregada era muito
+maior que as restantes, usámos \textbf{ponderação interna dos modelos}
+(\texttt{class\_weight} e \texttt{sample\_weight} com valor \texttt{'balanced'}):
+o modelo penaliza mais os erros nas classes sub-representadas sem alterar os dados.
+Esta abordagem preserva a distribuição real e torna a avaliação mais honesta.
+
+\textbf{Na Tentativa 2 (equal-width)}, o desequilíbrio é mais pronunciado porque a
+última classe concentra proporcionalmente mais instâncias. Adoptámos
+\textbf{SMOTE} (\textit{Synthetic Minority Oversampling Technique}), que gera
+instâncias sintéticas para as classes minoritárias por interpolação entre vizinhos
+próximos no espaço de features, sem descartar dados reais.
+
+Seguindo uma abordagem graduada -- em vez de saltar directamente para um balanceamento
+perfeito -- aplicámos quatro níveis e comparámos os resultados:
+\begin{enumerate}
+  \item \textbf{Baseline}: sem resampling (distribuição original do treino);
+  \item \textbf{SMOTE +5\%}: cada classe minoritária aumentada em 5\%;
+  \item \textbf{SMOTE +10\%}: cada classe minoritária aumentada em 10\%;
+  \item \textbf{SMOTE +20\%}: cada classe minoritária aumentada em 20\%.
+\end{enumerate}
+
+Em todos os casos, o SMOTE é aplicado \textit{apenas ao conjunto de treino}, após
+a divisão treino/validação/teste, para evitar \textit{data leakage}. Os conjuntos de
+validação e teste mantêm a distribuição real dos dados, garantindo que a avaliação
+é honesta e comparável entre níveis.
 
 \subsection{Métricas de Avaliação}
 
@@ -498,11 +547,12 @@ ecrã e atividade física sem requerer que as criemos manualmente.
   \item Encapsulámos o modelo num \texttt{Pipeline([StandardScaler, SVC])} para prevenir
     data leakage durante a validação cruzada;
   \item Kernel RBF: $K(x,x') = e^{-\gamma\|x-x'\|^2}$;
-  \item \texttt{class\_weight='balanced'} e \texttt{probability=True} (necessário para ROC-AUC);
-  \item Para o tuning, usámos \textbf{GridSearchCV} com apenas 12 combinações
-    ($C \in \{0.1, 1, 10\}$, $\gamma \in \{\text{scale}, \text{auto}\}$,
-    kernel $\in \{\text{rbf}, \text{linear}\}$) -- espaço pequeno o suficiente para
-    explorar exaustivamente sem custo computacional excessivo.
+  \item \texttt{class\_weight='balanced'} para compensar o desequilíbrio de classes;
+  \item \texttt{probability=True} (necessário para calcular o ROC-AUC);
+  \item Para o tuning, usámos \textbf{GridSearchCV} com 12 combinações:
+    $C \in \{0.1, 1, 10\}$, $\gamma \in \{\text{scale}, \text{auto}\}$ e
+    kernel $\in \{\text{rbf}, \text{linear}\}$ -- espaço suficientemente pequeno
+    para explorar exaustivamente sem custo computacional excessivo.
 \end{itemize}
 
 \subsubsection{Rede Neuronal (MLPClassifier)}
@@ -550,8 +600,8 @@ razões que se complementam:
 \textbf{Implementação}:
 \begin{itemize}
   \item \texttt{objective='multi:softprob'} para multiclasse;
-  \item \texttt{sample\_weight='balanced'} e \texttt{early\_stopping\_rounds} para parar
-    automaticamente quando o modelo deixar de melhorar;
+  \item \texttt{sample\_weight='balanced'} para compensar o desequilíbrio;
+  \item \texttt{early\_stopping\_rounds} para parar quando o modelo deixar de melhorar;
   \item \textbf{RandomizedSearchCV} com 20 combinações aleatórias -- pela mesma
     razão da MLP: o espaço de hiperparâmetros é demasiado grande para exploração exaustiva.
 \end{itemize}
@@ -784,9 +834,10 @@ um padrão interessante que nos ajudou a perceber melhor o problema:
 \begin{itemize}
   \item As \textbf{classes extremas (0 e 4)} são classificadas com muito mais precisão
     ($\approx$87--95\%), porque têm perfis de features muito distintos dos restantes;
-  \item As \textbf{classes intermédias (1 e 2)} são confundidas entre si (F1$\approx$0.72--0.73),
-    o que faz sentido: uma pessoa com stress ``baixo'' e uma com stress ``moderado'' têm
-    comportamentos muito semelhantes -- a fronteira entre elas é genuinamente ambígua.
+  \item As \textbf{classes intermédias (1, 2 e 3)} são confundidas entre si
+    (F1$\approx$0.72--0.73), o que faz sentido: uma pessoa com stress ``baixo'' e uma
+    com stress ``moderado'' têm comportamentos muito semelhantes -- a fronteira entre elas
+    é genuinamente ambígua.
 \end{itemize}
 
 O facto de o \textbf{SVM} ter obtido o melhor resultado no Cenário B (F1=0.8229) foi uma
@@ -806,9 +857,9 @@ e precisão}. A queda explica-se por dois fatores:
     é uma tarefa que nem um humano conseguiria fazer com certeza a partir de variáveis
     comportamentais. Os modelos têm de ``memorizar'' diferenças de fronteira ínfimas,
     o que cria instabilidade;
-  \item \textbf{Fronteiras artificiais}: o equal-frequency binning que escolhemos cria
-    limites estatisticamente coerentes mas semanticamente arbitrários, forçando o modelo
-    a distinguir casos onde a diferença real é quase nula.
+  \item \textbf{Fronteiras de igual largura}: o equal-width binning cria limites
+    geometricamente uniformes mas semanticamente arbitrários nas zonas intermédias,
+    forçando o modelo a distinguir casos onde a diferença real de comportamento é quase nula.
 \end{enumerate}
 
 Para perceber melhor o problema, analisámos as \textbf{Learning Curves} do XGBoost
@@ -941,6 +992,34 @@ discretos (0.0625, 0.125, \ldots), o que torna impossível atingir o limiar de 0
 uma limitação que reconhecemos desde o início. Para termos maior poder estatístico neste
 teste, teríamos de usar $k \geq 10$ folds, o que foi inviável pelo custo computacional
 do SVM com 3 cenários. Ainda assim, decidimos incluir os resultados por transparência.
+
+\subsection{Comparação com Trabalhos Existentes}
+
+Com os resultados obtidos, podemos agora fazer uma comparação mais informada com os
+trabalhos que consultámos no Background.
+
+Relativamente ao trabalho de Tolstoyj \cite{tolstoyj2024}, a diferença de abordagem
+é clara: onde ele tentou prever o valor numérico exato do stress (\textbf{regressão})
+e concluiu que as relações eram fracas, nós convertemos o stress contínuo em categorias
+e tratámos o problema como \textbf{classificação}. O nosso F1 macro de $\approx$0.95
+no Cenário A mostra que a fraqueza reportada por Tolstoyj não era uma característica
+do dataset, mas sim uma limitação da abordagem de regressão. Um modelo que só precisa
+de decidir ``esta pessoa está no grupo de stress alto ou baixo'' tem uma tarefa muito
+mais tratável do que um que tem de acertar num valor preciso como 7.38.
+
+No que toca à literatura académica, os nossos resultados no Cenário A (F1 = 0.9502)
+ficam próximos dos 0.98 reportados por Lei et al.\ \cite{lei2024} com Random Forest.
+A diferença é pequena e explicável: o dataset de Lei et al.\ contém apenas variáveis
+de sono, o que torna as classes mais facilmente separáveis. O nosso dataset inclui
+também tempo de ecrã e atividade física -- variáveis que, apesar de informativas,
+tornam o espaço de decisão mais complexo.
+Comparativamente ao trabalho de Huang et al.\ \cite{huang2024} (XGBoost, 90.66\%),
+os nossos modelos ficam acima -- o que é encorajador, dado que utilizámos dados e
+variáveis estruturalmente semelhantes.
+O resultado de Acosta et al.\ \cite{acosta2025} ($>$98\%) é claramente superior,
+mas é uma comparação injusta: sensores físicos contínuos (frequência cardíaca,
+temperatura, saturação de oxigénio) são muito mais ricos em informação do que
+registos de comportamento como os nossos.
 
 \subsection{Limitações e Desafios}
 

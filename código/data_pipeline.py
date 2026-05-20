@@ -96,7 +96,20 @@ def generate_targets(df):
     
     # Atribuição da variável final numérica para pipeline e plotagem EDA
     df['target_C'] = pd.qcut(df['stress_level'], q=10, labels=False, duplicates='drop')
-    
+
+    # --- Tentativa 2: Equal-Width Binning (garante exatamente 5 e 10 classes) ---
+    # Motivação: o equal-frequency fundiu bins superiores devido ao efeito de teto
+    # (mais de 20% dos registos com stress_level = 10.0). O equal-width divide o
+    # intervalo de valores em partes iguais, independentemente da contagem por classe.
+    df['target_B_ew'] = pd.cut(df['stress_level'], bins=5, labels=False)
+    df['target_C_ew'] = pd.cut(df['stress_level'], bins=10, labels=False)
+
+    print("\n=== TENTATIVA 2: EQUAL-WIDTH BINNING ===")
+    print("\nDistribuição Cenário B - Equal-Width (5 Classes exatas):")
+    print(df['target_B_ew'].value_counts().sort_index())
+    print("\nDistribuição Cenário C - Equal-Width (10 Classes exatas):")
+    print(df['target_C_ew'].value_counts().sort_index())
+
     return df
 
 # 1.4 Análise Exploratória de Dados (EDA)
@@ -107,8 +120,9 @@ def run_eda(df):
     # Isolar numéricas
     num_cols = df.select_dtypes(include=['float64', 'int64']).columns.tolist()
     # Ignorar columns desnecessárias dos targets secundários da EDA
-    excluir = ['user_id', 'target_A', 'target_B', 'target_C', 'stress_level']
-    excluir += [c for c in df.columns if 'target_C_' in c] 
+    excluir = ['user_id', 'target_A', 'target_B', 'target_C',
+               'target_B_ew', 'target_C_ew', 'stress_level']
+    excluir += [c for c in df.columns if 'target_C_' in c]
     num_cols = [c for c in num_cols if c not in excluir]
     
     # 1. Distribuições univariadas
@@ -122,21 +136,34 @@ def run_eda(df):
     plt.savefig('graficos/eda_distribuicoes.png')
     plt.close()
     
-    # 2. Target analysis e Class Imbalance
+    # 2a. Tentativa 1: Equal-Frequency (qcut) - Target analysis
     plt.figure(figsize=(15, 4))
     plt.subplot(1, 3, 1)
     sns.histplot(df['stress_level'], kde=True)
     plt.title('Stress Contínuo Original')
-    
+
     plt.subplot(1, 3, 2)
     sns.countplot(x=df['target_B'], palette='Set2')
-    plt.title('Target B (5 Classes)')
-    
+    plt.title('Target B - Equal-Freq (4 Classes Efetivas)')
+
     plt.subplot(1, 3, 3)
     sns.countplot(x=df['target_C'], palette='Set3')
-    plt.title('Target C (10 Classes)')
+    plt.title('Target C - Equal-Freq (8 Classes Efetivas)')
     plt.tight_layout()
     plt.savefig('graficos/eda_targets.png')
+    plt.close()
+
+    # 2b. Tentativa 2: Equal-Width (pd.cut) - Target analysis
+    plt.figure(figsize=(10, 4))
+    plt.subplot(1, 2, 1)
+    sns.countplot(x=df['target_B_ew'], palette='Set2')
+    plt.title('Target B - Equal-Width (5 Classes Exatas)')
+
+    plt.subplot(1, 2, 2)
+    sns.countplot(x=df['target_C_ew'], palette='Set3')
+    plt.title('Target C - Equal-Width (10 Classes Exatas)')
+    plt.tight_layout()
+    plt.savefig('graficos/eda_targets_ew.png')
     plt.close()
     
     # 3. Matrizes de correlação (Pearson + Spearman lado a lado)
@@ -199,7 +226,8 @@ def feature_engineering(df):
     df_fe['sedentario'] = np.where(df_fe['physical_activity_minutes'] < 30, 1, 0)
     
     # Identificar colunas para ignorar no modelo
-    drop_cols = ['user_id', 'stress_level', 'target_A', 'target_B', 'target_C']
+    drop_cols = ['user_id', 'stress_level', 'target_A',
+                 'target_B', 'target_C', 'target_B_ew', 'target_C_ew']
     drop_cols += [c for c in df_fe.columns if 'target_C_' in c]
     
     X_tmp = df_fe.drop(columns=[c for c in drop_cols if c in df_fe.columns])
@@ -245,21 +273,40 @@ def preprocess_and_split(X, y):
     
     return X_train_scaled, X_val_scaled, X_test_scaled, y_train, y_val, y_test
 
-# 1.7 Estratégias para Desequilíbrio de Classes
-def apply_imbalance_strategies(X_train, y_train):
-    print("\n--- 1.7 Estratégias para Desequilíbrio de Classes (Treino) ---")
+# 1.7 Oversampling Graduado (baseline + 5%, 10%, 20%)
+# Abordagem recomendada: nunca saltar para balanceamento perfeito; comparar
+# progressivamente o efeito de cada nível de oversampling nos modelos.
+def apply_imbalance_strategies(X_train, y_train, percentages=(5, 10, 20)):
+    print("\n--- 1.7 Oversampling Graduado (Treino) ---")
     if SMOTE is None:
         print("Módulos imbalanced-learn não configurados. Ignorando.")
-        return
-        
-    print("Contagem Original de Classes:")
-    print(pd.Series(y_train).value_counts().sort_index())
-    
-    # 1. SMOTE
-    smote = SMOTE(random_state=42)
-    X_sm, y_sm = smote.fit_resample(X_train, y_train)
-    print("\n[SMOTE] Contagem de Classes:")
-    print(pd.Series(y_sm).value_counts().sort_index())
+        return {'baseline': (X_train, y_train)}
+
+    counts = pd.Series(y_train).value_counts()
+    majority_count = int(counts.max())
+
+    print("Baseline (sem resampling):")
+    print(counts.sort_index())
+
+    results = {'baseline': (X_train, y_train)}
+
+    for pct in percentages:
+        # Para cada classe minoritária, calcular quantas amostras adicionar (+pct%)
+        # A classe maioritária não é alterada
+        sampling_strategy = {}
+        for cls, count in counts.items():
+            target = int(count * (1 + pct / 100.0))
+            if target > count:
+                sampling_strategy[cls] = target
+
+        smote = SMOTE(sampling_strategy=sampling_strategy, random_state=42)
+        X_res, y_res = smote.fit_resample(X_train, y_train)
+
+        print(f"\n[SMOTE +{pct}%] Contagem de Classes:")
+        print(pd.Series(y_res).value_counts().sort_index())
+        results[f'smote_{pct}pct'] = (X_res, y_res)
+
+    return results
 
 def main():
     print("==================================================")
@@ -283,16 +330,37 @@ def main():
     # 1.5 Feature Engineering (Meu código)
     X_features, df_fe = feature_engineering(df)
     
-    # Escolha de variável para 1.6 e 1.7
-    # Usaremos Cenário B (5 classes)
+    # =========================================================
+    # TENTATIVA 1: Equal-Frequency Binning (qcut)
+    # =========================================================
+    print("\n" + "="*50)
+    print("  TENTATIVA 1: EQUAL-FREQUENCY BINNING (qcut)")
+    print("="*50)
     y_cenario_B = df_fe['target_B'].astype(int)
-    
-    # 1.6 Pré-processamento e Divisão
     X_train_s, X_val_s, X_test_s, y_train, y_val, y_test = preprocess_and_split(X_features, y_cenario_B)
-    
-    # 1.7 Tratamento de Desequilíbrio
-    apply_imbalance_strategies(X_train_s, y_train)
-    
+    # Nota: aqui a última classe tem ~dobro das instâncias (efeito de teto)
+    print("\n[Tentativa 1] Distribuição do treino por classe:")
+    print(pd.Series(y_train).value_counts().sort_index())
+
+    # =========================================================
+    # TENTATIVA 2: Equal-Width Binning (pd.cut) + Oversampling Graduado
+    # =========================================================
+    print("\n" + "="*50)
+    print("  TENTATIVA 2: EQUAL-WIDTH BINNING + OVERSAMPLING GRADUADO")
+    print("="*50)
+    y_cenario_B_ew = df_fe['target_B_ew'].astype(int)
+    X_train_ew, X_val_ew, X_test_ew, y_train_ew, y_val_ew, y_test_ew = preprocess_and_split(
+        X_features, y_cenario_B_ew)
+
+    # 1.7 Oversampling graduado: baseline, +5%, +10%, +20%
+    # Treinar modelos com cada versão e comparar resultados (ver relatório)
+    resampled_sets = apply_imbalance_strategies(X_train_ew, y_train_ew,
+                                                percentages=(5, 10, 20))
+
+    print("\nConjuntos disponíveis para treino:")
+    for name, (X_r, y_r) in resampled_sets.items():
+        print(f"  {name}: {len(X_r)} amostras de treino")
+
     print("\n✅ Pipeline base concluída com sucesso!")
 
 if __name__ == '__main__':
