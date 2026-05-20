@@ -37,6 +37,11 @@ from data_pipeline import load_and_inspect_data, generate_targets, feature_engin
 # PIPELINE BASE
 # =============================================================
 def _build_svm_pipeline():
+    """
+    Constrói a pipeline base para o modelo Support Vector Machine (SVC).
+    Inclui o StandardScaler para normalização dos dados e o próprio SVC,
+    com pesos equilibrados (class_weight='balanced') e cálculos de probabilidade ativos.
+    """
     return Pipeline([
         ('scaler', StandardScaler()),
         ('svm', SVC(
@@ -52,6 +57,11 @@ def _build_svm_pipeline():
 # BASELINE (sem tuning)
 # =============================================================
 def train_svm_baseline(X_train, y_train, X_val, y_val, scenario):
+    """
+    Treina e avalia o modelo SVM com os hiperparâmetros por defeito (Baseline).
+    Gera as predições no conjunto de validação, regista as métricas de desempenho
+    e cria a matriz de confusão associada.
+    """
     print(f"\n  [SVM Baseline] Cenário {scenario}")
     pipe = _build_svm_pipeline()
     pipe.fit(X_train, y_train)
@@ -75,11 +85,9 @@ def train_svm_baseline(X_train, y_train, X_val, y_val, scenario):
 # =============================================================
 def tune_svm(X_train, y_train, X_val, y_val, scenario):
     """
-    GridSearchCV sobre:
-      C      ∈ {0.1, 1, 10}          — regularização (margem vs erros)
-      gamma  ∈ {'scale', 'auto'}     — largura do kernel RBF
-      kernel ∈ {'rbf', 'linear'}     — tipo de fronteira de decisão
-    Total: 12 combinações × 5 folds = 60 fits
+    Optimiza os hiperparâmetros do SVM através de GridSearchCV com StratifiedKFold(k=5).
+    Busca a melhor combinação de regularização (C), largura do kernel (gamma) e tipo de kernel,
+    treinando o modelo final otimizado, avaliando no conjunto de validação e guardando a matriz de confusão.
     """
     print(f"\n  [SVM GridSearchCV] Cenário {scenario}")
     pipe = _build_svm_pipeline()
@@ -112,6 +120,11 @@ def tune_svm(X_train, y_train, X_val, y_val, scenario):
 # CV BASELINE
 # =============================================================
 def run_cv_baseline(X_raw, y, scenario, cv_rows):
+    """
+    Executa validação cruzada (Cross-Validation) no conjunto de dados completo com o modelo baseline.
+    Regista as métricas médias (F1-macro) e desvios padrão, essenciais para ter uma métrica robusta
+    da performance antes do tuning.
+    """
     cv    = StratifiedKFold(n_splits=CV_FOLDS, shuffle=True, random_state=RANDOM_STATE)
     pipe  = _build_svm_pipeline()
     scores = cross_val_score(pipe, X_raw, y, cv=cv, scoring='f1_macro', n_jobs=-1)
@@ -128,6 +141,12 @@ def run_cv_baseline(X_raw, y, scenario, cv_rows):
 # MAIN
 # =============================================================
 def main():
+    """
+    Função principal que orquestra o pipeline de treino do SVM:
+    1. Carrega e pré-processa os dados.
+    2. Executa o baseline com validação cruzada.
+    3. Treina, optimiza, avalia e guarda os modelos finais para os cenários A, B e C.
+    """
     print("=" * 60)
     print("   MODEL_SVM.PY — Support Vector Machine")
     print("=" * 60)

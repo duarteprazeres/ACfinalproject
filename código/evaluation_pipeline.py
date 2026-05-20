@@ -53,6 +53,11 @@ MODEL_NAMES = ['svm', 'nn', 'xgb']
 # LOAD DATA
 # ════════════════════════════════════════════════════════════════════════════
 def load_data():
+    """
+    Carrega o dataset e prepara os dados utilizando as funções do data_pipeline.
+    Retorna as features cruas, o dataframe com as features processadas e os dicionários
+    de targets para os cenários A, B e C, removendo eventuais valores nulos introduzidos na transformação.
+    """
     filepath = 'dataset/sleep_mobile_stress_dataset_15000.csv'
     if not os.path.exists(filepath):
         filepath = 'sleep_mobile_stress_dataset_15000.csv'
@@ -74,6 +79,10 @@ def load_data():
 # LOAD MODELS
 # ════════════════════════════════════════════════════════════════════════════
 def load_models():
+    """
+    Carrega os modelos treinados e serializados (.pkl) a partir do diretório predefinido.
+    Isto inclui os modelos de SVM, Neural Networks, XGBoost e os respetivos codificadores de labels (LabelEncoders).
+    """
     models = {}
     for sc in SCENARIOS:
         models[f'svm_{sc}'] = joblib.load(MODELS_DIR / f'svm_cenario_{sc}.pkl')
@@ -88,6 +97,12 @@ def load_models():
 # 3.1  ANÁLISE DE ERROS
 # ════════════════════════════════════════════════════════════════════════════
 def section_31(models, X_raw, df_fe, targets):
+    """
+    Secção 3.1: Análise de Erros.
+    Gera matrizes de confusão (contagens e normalizadas), relatórios de classificação (precision, recall, f1)
+    e extrai os exemplos classificados incorretamente para ficheiros CSV.
+    Adicionalmente, traça curvas de aprendizagem para SVM e XGBoost, e curvas de perda (loss curves) para Redes Neuronais.
+    """
     print("\n" + "="*60)
     print("  3.1 — ANÁLISE DE ERROS")
     print("="*60)
@@ -201,6 +216,12 @@ def section_31(models, X_raw, df_fe, targets):
 # 3.2  INTERPRETABILIDADE
 # ════════════════════════════════════════════════════════════════════════════
 def section_32(models, X_raw, targets):
+    """
+    Secção 3.2: Interpretabilidade.
+    Avalia e visualiza a importância das features para os modelos treinados.
+    Utiliza Feature Importance nativa e SHAP para o XGBoost, e Permutation Importance (agnóstica ao modelo)
+    para o SVM, Redes Neuronais e XGBoost, permitindo perceber quais as variáveis mais influentes.
+    """
     print("\n" + "="*60)
     print("  3.2 — INTERPRETABILIDADE")
     print("="*60)
@@ -277,6 +298,12 @@ def section_32(models, X_raw, targets):
 # 3.3  TESTES DE SIGNIFICÂNCIA ESTATÍSTICA
 # ════════════════════════════════════════════════════════════════════════════
 def section_33(models, X_raw, targets):
+    """
+    Secção 3.3: Testes de Significância Estatística.
+    Realiza o Teste de McNemar (para comparar predições pareadas) e o Teste de Wilcoxon
+    (para comparar as pontuações F1 nas dobras da validação cruzada) entre os modelos,
+    verificando se a diferença de performance é estatisticamente significativa.
+    """
     print("\n" + "="*60)
     print("  3.3 — TESTES DE SIGNIFICÂNCIA ESTATÍSTICA")
     print("="*60)
@@ -361,6 +388,11 @@ def section_33(models, X_raw, targets):
 # 3.4  AVALIAÇÃO FINAL NO CONJUNTO DE TESTE
 # ════════════════════════════════════════════════════════════════════════════
 def section_34(models, X_raw, targets):
+    """
+    Secção 3.4: Avaliação Final no Conjunto de Teste.
+    Calcula diversas métricas de desempenho (F1-Macro, F1-Weighted, Accuracy, Cohen's Kappa, MCC, ROC-AUC)
+    num conjunto de dados retido (Hold-Out) e exporta os resultados para um ficheiro CSV.
+    """
     print("\n" + "="*60)
     print("  3.4 — AVALIAÇÃO FINAL HOLD-OUT (TEST SET)")
     print("="*60)
@@ -426,6 +458,11 @@ def section_34(models, X_raw, targets):
 # 3.5  TABELA COMPARATIVA FINAL
 # ════════════════════════════════════════════════════════════════════════════
 def section_35(test_df, X_raw, targets, models):
+    """
+    Secção 3.5: Tabela Comparativa Final.
+    Junta a performance média obtida na validação cruzada (CV) com as métricas da avaliação final (Test),
+    gerando e guardando uma tabela formatada visualmente (PNG) que resume o desempenho de todos os modelos.
+    """
     print("\n" + "="*60)
     print("  3.5 — TABELA COMPARATIVA FINAL")
     print("="*60)
@@ -500,6 +537,11 @@ def section_35(test_df, X_raw, targets, models):
 # MAIN
 # ════════════════════════════════════════════════════════════════════════════
 def main():
+    """
+    Função principal que coordena a execução sequencial de todas as secções da pipeline de avaliação.
+    Garante o carregamento de dados e modelos, e invoca as análises de erro, interpretabilidade,
+    significância e avaliação final em série.
+    """
     print("=" * 60)
     print("   EVALUATION_PIPELINE.PY — Análise de Erros e Avaliação Final")
     print("=" * 60)

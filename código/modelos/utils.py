@@ -44,10 +44,10 @@ GRAFICOS_DIR.mkdir(exist_ok=True)
 # =============================================================
 def compute_metrics(y_true, y_pred, y_proba=None, scenario='A'):
     """
-    Calcula métricas adequadas a cada cenário:
-      A (binário):  F1-macro, Precision, Recall, ROC-AUC, MCC
-      B (5 cls):    F1-macro, Weighted-F1, Cohen's Kappa
-      C (10 cls):   F1-macro, Weighted-F1, Cohen's Kappa, Top-2 Accuracy
+    Calcula e devolve um dicionário com métricas de desempenho ajustadas ao cenário.
+    - Cenário A (binário): F1-macro, Precision, Recall, ROC-AUC, MCC.
+    - Cenário B (5 classes): F1-macro, F1-weighted, Cohen's Kappa.
+    - Cenário C (10 classes): F1-macro, F1-weighted, Cohen's Kappa, Top-2 Accuracy.
     """
     metrics = {
         'f1_macro':      f1_score(y_true, y_pred, average='macro',    zero_division=0),
@@ -85,7 +85,11 @@ def compute_metrics(y_true, y_pred, y_proba=None, scenario='A'):
 # 2.8 LOGGING CSV
 # =============================================================
 def log_experiment(model_name, scenario, params, metrics, split='val'):
-    """Acrescenta uma linha ao experiment_results.csv."""
+    """
+    Acrescenta uma nova linha de registo no ficheiro 'experiment_results.csv'.
+    Regista o timestamp, o nome do modelo, o cenário, a secção (split), 
+    os hiperparâmetros (formatados em JSON) e todas as métricas extraídas.
+    """
     row = {
         'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         'model':     model_name,
@@ -105,7 +109,10 @@ def log_experiment(model_name, scenario, params, metrics, split='val'):
 # GRÁFICOS
 # =============================================================
 def plot_confusion_matrix_fig(y_true, y_pred, model_name, scenario_name):
-    """Confusion matrix normalizada → graficos/."""
+    """
+    Gera e guarda uma imagem da matriz de confusão normalizada na pasta 'graficos/'.
+    Mapeia graficamente as verdadeiras classes contra as predições do modelo para facilitar a análise.
+    """
     cm  = confusion_matrix(y_true, y_pred, normalize='true')
     n   = len(np.unique(y_true))
     fig, ax = plt.subplots(figsize=(max(6, n), max(5, n - 1)))
@@ -120,7 +127,10 @@ def plot_confusion_matrix_fig(y_true, y_pred, model_name, scenario_name):
 
 
 def plot_cv_baseline(cv_rows, model_name):
-    """Gráfico de barras com F1 mean ± std do CV baseline."""
+    """
+    Constrói e guarda um gráfico de barras ilustrando a performance média (com erro/desvio padrão)
+    da validação cruzada para o modelo indicado, separando os resultados pelos diferentes cenários.
+    """
     df = pd.DataFrame(cv_rows)
     palette = {'A': '#4C72B0', 'B': '#DD8452', 'C': '#55A868'}
     colors  = [palette.get(r['scenario'], '#888') for _, r in df.iterrows()]
@@ -149,7 +159,11 @@ def plot_cv_baseline(cv_rows, model_name):
 # DIVISÃO DOS DADOS
 # =============================================================
 def split_scenario(X_raw, y, scenario_name):
-    """Split estratificado 70/15/15. Devolve arrays sem normalização."""
+    """
+    Realiza o split dos dados de forma estratificada (70% treino, 15% validação, 15% teste).
+    Garante que a proporção das classes se mantém consistente entre todas as partes.
+    Retorna os arrays não normalizados para serem processados pela pipeline dos modelos.
+    """
     X_tmp, X_test, y_tmp, y_test = train_test_split(
         X_raw, y, test_size=TEST_SIZE, stratify=y, random_state=RANDOM_STATE
     )
@@ -164,7 +178,10 @@ def split_scenario(X_raw, y, scenario_name):
 # PERSISTÊNCIA
 # =============================================================
 def save_model(obj, filename):
-    """Guarda um objecto com joblib."""
+    """
+    Serializa e guarda um modelo treinado (ou codificador) em formato .pkl
+    dentro da pasta predefinida 'models', permitindo o seu carregamento posterior.
+    """
     path = MODELS_DIR / filename
     joblib.dump(obj, path)
     print(f"   Guardado: {path}")
@@ -172,7 +189,10 @@ def save_model(obj, filename):
 
 
 def update_registry(registry_updates: dict):
-    """Acrescenta/actualiza entradas no model_registry.json."""
+    """
+    Atualiza ou cria o ficheiro 'model_registry.json', que funciona como um catálogo
+    dos modelos treinados, gravando no disco as configurações e as métricas obtidas por cada um.
+    """
     reg_path = MODELS_DIR / 'model_registry.json'
     if reg_path.exists():
         with open(reg_path) as f:

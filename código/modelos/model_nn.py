@@ -44,6 +44,12 @@ from data_pipeline import load_and_inspect_data, generate_targets, feature_engin
 # PIPELINE BASE
 # =============================================================
 def _build_nn_pipeline():
+    """
+    Constrói a pipeline base para a Rede Neuronal (MLPClassifier).
+    Inclui normalização (StandardScaler) e um classificador Multi-Layer Perceptron
+    configurado com duas camadas ocultas, otimizador Adam, early stopping (para evitar overfitting)
+    e um limite máximo de 200 épocas.
+    """
     return Pipeline([
         ('scaler', StandardScaler()),
         ('mlp', MLPClassifier(
@@ -67,6 +73,10 @@ def _build_nn_pipeline():
 # LOSS CURVE
 # =============================================================
 def plot_nn_loss(mlp_step, scenario_name, tag='tuned'):
+    """
+    Gera e guarda um gráfico com a evolução da função de perda (Loss Curve) da Rede Neuronal ao longo das épocas.
+    Mostra a perda no conjunto de treino e, se aplicável, o score no conjunto de validação interno.
+    """
     if not hasattr(mlp_step, 'loss_curve_') or not mlp_step.loss_curve_:
         return
     fig, ax1 = plt.subplots(figsize=(9, 4))
@@ -96,6 +106,11 @@ def plot_nn_loss(mlp_step, scenario_name, tag='tuned'):
 # BASELINE
 # =============================================================
 def train_nn_baseline(X_train, y_train, X_val, y_val, scenario):
+    """
+    Treina e avalia a Rede Neuronal com a arquitetura e hiperparâmetros predefinidos (Baseline).
+    Gera predições, calcula as métricas, guarda o log de resultados, cria a matriz de confusão
+    e o gráfico da loss curve inicial.
+    """
     print(f"\n  [NN Baseline] Cenário {scenario}")
     pipe = _build_nn_pipeline()
     pipe.fit(X_train, y_train)
@@ -120,11 +135,10 @@ def train_nn_baseline(X_train, y_train, X_val, y_val, scenario):
 # =============================================================
 def tune_nn(X_train, y_train, X_val, y_val, scenario):
     """
-    RandomizedSearchCV (15 iterações) sobre:
-      hidden_layer_sizes ∈ {(128,64), (256,128,64), (64,32)}  — profundidade/largura
-      alpha              ∈ {1e-4, 1e-3, 1e-2}                 — regularização L2
-      learning_rate_init ∈ {1e-3, 5e-4, 1e-4}                 — taxa de aprendizagem
-      batch_size         ∈ {32, 64}                            — mini-batch
+    Optimiza a Rede Neuronal usando RandomizedSearchCV devido ao amplo espaço de hiperparâmetros.
+    Realiza 15 iterações de teste alterando a arquitetura da rede (hidden_layer_sizes),
+    a taxa de regularização (alpha), a taxa de aprendizagem inicial e o tamanho do batch.
+    Retorna o modelo otimizado e guarda as matrizes de confusão e curvas de erro.
     """
     print(f"\n  [NN RandomizedSearchCV] Cenário {scenario}")
     pipe = _build_nn_pipeline()
@@ -159,6 +173,11 @@ def tune_nn(X_train, y_train, X_val, y_val, scenario):
 # CV BASELINE
 # =============================================================
 def run_cv_baseline(X_raw, y, scenario, cv_rows):
+    """
+    Executa validação cruzada (Cross-Validation) de 5 dobras sobre o modelo baseline,
+    mas com restrições mais fortes (max_iter=100) para acelerar o processo.
+    Regista o F1-macro médio e o desvio padrão como referência base para o modelo.
+    """
     cv   = StratifiedKFold(n_splits=CV_FOLDS, shuffle=True, random_state=RANDOM_STATE)
     pipe = _build_nn_pipeline()
     pipe.set_params(mlp__max_iter=100, mlp__n_iter_no_change=5)
@@ -176,6 +195,12 @@ def run_cv_baseline(X_raw, y, scenario, cv_rows):
 # MAIN
 # =============================================================
 def main():
+    """
+    Função principal que orquestra o pipeline de treino da Rede Neuronal:
+    1. Carrega e prepara os dados.
+    2. Executa a validação cruzada do baseline.
+    3. Treina, otimiza e regista os modelos finais para todos os cenários.
+    """
     print("=" * 60)
     print("   MODEL_NN.PY — Rede Neuronal (MLPClassifier)")
     print("=" * 60)
