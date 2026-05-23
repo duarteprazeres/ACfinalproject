@@ -78,6 +78,9 @@ pip install -r requirements.txt
 # 2. Correr o pipeline completo (todas as fases de uma vez)
 python3 run.py
 
+# Alternativa: carregar os modelos já treinados e ver previsões no conjunto de teste
+python3 predict.py
+
 # Ou correr cada fase individualmente:
 python3 -m código.data_pipeline                  # Fase 1 — Dados, EDA e feature engineering
 python3 -m código.modelos.model_svm              # Fase 2 — SVM
