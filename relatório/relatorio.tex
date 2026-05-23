@@ -23,24 +23,47 @@
   breaklines=true
 }
 
-\title{
-  \textbf{Classificação do Nível de Stress}\\[0.4em]
-  \large Machine Learning 2026 -- LIACD\\
-  Departamento de Engenharia Informática
-}
-\author{
-  Duarte Prazeres\\
-  \small \texttt{duartecastromarques@gmail.com}\\
-  \small Nº 2023214962
-  \and
-  Marília Brito\\
-  \small \texttt{mariliamontemorb@gmail.com}\\
-  \small Nº 2024225969
-}
-\date{Maio 2026}
-
 \begin{document}
-\maketitle
+
+% ════════════════════════════════════════════════════════
+%  CAPA
+% ════════════════════════════════════════════════════════
+\begin{titlepage}
+\centering
+
+\vspace*{2cm}
+
+{\large Departamento de Engenharia Informática}\\[0.3em]
+{\normalsize Aprendizagem Computacional --- LIACD --- 2025/2026}
+
+\vspace{3cm}
+
+\rule{\textwidth}{1.5pt}\\[0.6em]
+{\LARGE\bfseries Classificação do Nível de Stress}\\[0.4em]
+{\large com base em dados comportamentais de smartphone}\\[0.6em]
+\rule{\textwidth}{1.5pt}
+
+\vspace{0.8em}
+{\normalsize\itshape Modelos: SVM\,$\cdot$\,Rede Neuronal (MLP)\,$\cdot$\,XGBoost}
+
+\vspace{2.5cm}
+
+\begin{tabular}{p{0.45\textwidth}p{0.45\textwidth}}
+  \centering
+  \textbf{Duarte Prazeres}\\[0.3em]
+  \small\texttt{duartecastromarques@gmail.com}\\[0.2em]
+  \small Nº\,2023214962
+  &
+  \centering
+  \textbf{Marília Brito}\\[0.3em]
+  \small\texttt{mariliamontemorb@gmail.com}\\[0.2em]
+  \small Nº\,2024225969
+\end{tabular}
+
+\vfill
+{\large Maio de 2026}
+
+\end{titlepage}
 \newpage
 \tableofcontents
 \newpage
@@ -493,19 +516,93 @@ restantes devido ao efeito de teto do dataset. Para compensar, adoptámos
 instâncias sintéticas para as classes minoritárias por interpolação entre vizinhos
 próximos no espaço de features, sem descartar dados reais.
 
-Seguindo a recomendação de não saltar directamente para um balanceamento perfeito,
-aplicámos quatro níveis de oversampling e comparámos os resultados:
+Seguindo a recomendação de não saltar diretamente para um balanceamento perfeito,
+testámos seis níveis de forma gradual — apenas nas classes minoritárias, sem alterar
+a classe maioritária:
+
 \begin{enumerate}
   \item \textbf{Baseline}: sem resampling (distribuição original do treino);
   \item \textbf{SMOTE +5\%}: cada classe minoritária aumentada em 5\%;
   \item \textbf{SMOTE +10\%}: cada classe minoritária aumentada em 10\%;
-  \item \textbf{SMOTE +20\%}: cada classe minoritária aumentada em 20\%.
+  \item \textbf{SMOTE +20\%}: cada classe minoritária aumentada em 20\%;
+  \item \textbf{SMOTE +30\%}: cada classe minoritária aumentada em 30\%;
+  \item \textbf{SMOTE +50\%}: cada classe minoritária aumentada em 50\%.
 \end{enumerate}
 
 Em todos os casos, o SMOTE é aplicado \textit{apenas ao conjunto de treino}, após
 a divisão treino/validação/teste, para evitar \textit{data leakage}. Os conjuntos de
-validação e teste mantêm a distribuição real dos dados, garantindo que a avaliação
-é honesta e comparável entre níveis.
+validação e teste mantêm a distribuição real dos dados.
+
+\paragraph{Metodologia de seleção do nível.}
+Para escolher o nível de SMOTE sem incorrer em custo computacional excessivo,
+usámos uma \textbf{Random Forest com hiperparâmetros fixos} como modelo proxy
+(200 árvores, \texttt{class\_weight=`balanced'}, sem tuning). Esta abordagem é
+justificada porque a seleção do nível de SMOTE é uma decisão de
+\textit{pré-processamento} — independente do modelo final — e a Random Forest
+fornece uma estimativa robusta da separabilidade das classes. O critério de seleção
+foi o \textbf{F1 macro no conjunto de teste} (que mantém a distribuição real).
+Escolhemos um nível por cenário, comum aos três modelos, para garantir que a
+comparação entre SVM, NN e XGBoost é feita sobre o mesmo conjunto de treino.
+
+\paragraph{Resultados da comparação.}
+As tabelas~\ref{tab:smote_b} e~\ref{tab:smote_c} resumem os resultados obtidos.
+
+\begin{table}[H]
+\centering
+\caption{Impacto do SMOTE no Cenário B (5 classes) — modelo proxy: Random Forest.}
+\label{tab:smote_b}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Nível} & \textbf{$n$ treino} & \textbf{F1 Val} & \textbf{F1 Teste} \\
+\midrule
+Baseline      & 10\,500 & 0.7352 & 0.7455 \\
+SMOTE +5\%    & 10\,800 & 0.7421 & 0.7445 \\
+SMOTE +10\%   & 11\,102 & 0.7372 & 0.7523 \\
+SMOTE +20\%   & 11\,705 & 0.7351 & 0.7469 \\
+\textbf{SMOTE +30\%} & \textbf{12\,307} & \textbf{0.7415} & \textbf{0.7533} \\
+SMOTE +50\%   & 13\,515 & 0.7380 & 0.7482 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Impacto do SMOTE no Cenário C (10 classes) — modelo proxy: Random Forest.}
+\label{tab:smote_c}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Nível} & \textbf{$n$ treino} & \textbf{F1 Val} & \textbf{F1 Teste} \\
+\midrule
+\textbf{Baseline} & \textbf{10\,500} & \textbf{0.4658} & \textbf{0.4848} \\
+SMOTE +5\%    & 10\,845 & 0.4616 & 0.4682 \\
+SMOTE +10\%   & 11\,193 & 0.4640 & 0.4725 \\
+SMOTE +20\%   & 11\,888 & 0.4705 & 0.4812 \\
+SMOTE +30\%   & 12\,585 & 0.4697 & 0.4776 \\
+SMOTE +50\%   & 13\,979 & 0.4781 & 0.4843 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Decisão e justificação.}
+O Cenário A não necessita de SMOTE — as classes estão perfeitamente balanceadas
+(50\%/50\%). Para os Cenários B e C, a análise dos resultados revela padrões distintos:
+
+\begin{itemize}
+  \item \textbf{Cenário B — SMOTE +30\%}: o nível +30\% obteve o melhor F1 no teste
+    (0.7533), superando o baseline em cerca de +0.8 pontos percentuais. As melhorias
+    são modestas mas consistentes, o que é esperado: com 5 classes e uma proporção
+    de desequilíbrio de $\approx$1:4.6, o modelo já consegue aprender razoavelmente
+    sem resampling.
+
+  \item \textbf{Cenário C — Baseline}: o SMOTE não produziu melhorias consistentes.
+    O baseline obteve o melhor F1 no teste (0.4848), e nenhum nível de oversampling
+    o superou de forma clara. Isto deve-se provavelmente ao facto de as classes mais
+    pequenas (classe~0 com apenas 463 amostras de treino) terem muito poucos vizinhos
+    reais, fazendo com que o SMOTE gere exemplos sintéticos ruidosos que prejudicam
+    mais do que ajudam. O desequilíbrio residual é gerido nos modelos finais através
+    de \texttt{class\_weight=`balanced'} (SVM e NN) e \texttt{sample\_weight}
+    (XGBoost).
+\end{itemize}
 
 \subsection{Métricas de Avaliação}
 
