@@ -40,7 +40,7 @@
 
 \rule{\textwidth}{1.5pt}\\[0.6em]
 {\LARGE\bfseries Classificação do Nível de Stress}\\[0.4em]
-{\large com base em dados comportamentais de smartphone}\\[0.6em]
+{\large Projeto Final}\\[0.6em]
 \rule{\textwidth}{1.5pt}
 
 \vspace{0.8em}
@@ -83,9 +83,9 @@ consoante a granularidade de classes que se pretendesse. Em vez de nos limitarmo
 formato, decidimos atacá-lo sob três perspetivas de complexidade crescente:
 
 \begin{itemize}
-  \item \textbf{Cenário A} -- Classificação binária: \textit{sem stress} (0) vs \textit{com stress} (1);
-  \item \textbf{Cenário B} -- 5 classes (ver §\ref{sec:targets} para o processo de discretização);
-  \item \textbf{Cenário C} -- 10 classes (ver §\ref{sec:targets} para o processo de discretização).
+  \item \textbf{Cenário A}: classificação binária: \textit{sem stress} (0) vs \textit{com stress} (1);
+  \item \textbf{Cenário B}: 5 classes (ver §\ref{sec:targets} para o processo de discretização);
+  \item \textbf{Cenário C}: 10 classes (ver §\ref{sec:targets} para o processo de discretização).
 \end{itemize}
 
 Esta estrutura em três cenários permitiu-nos não só avaliar o desempenho dos modelos, mas
@@ -99,7 +99,7 @@ fiáveis do que uma divisão única), com \textbf{otimização de hiperparâmetr
 sistemático dos parâmetros de configuração de cada modelo para encontrar a melhor
 combinação possível) e com \textbf{testes de significância estatística} (verificação
 formal de que as diferenças observadas entre modelos não são produto do acaso).
-O desempenho é reportado em \textbf{F1 macro} -- uma métrica que mede a qualidade das
+O desempenho é reportado em \textbf{F1 macro}, uma métrica que mede a qualidade das
 previsões tratando todas as classes de forma igualitária, independentemente da sua
 frequência. Os principais resultados que obtivemos foram F1 macro de $\approx$0.95
 (Cenário A), $\approx$0.82 (Cenário B) e $\approx$0.58 (Cenário C).
@@ -172,7 +172,7 @@ Quando abrimos o dataset pela primeira vez, verificámos que continha 15\,000 in
 com 13 variáveis descrevendo o comportamento diário de diferentes utilizadores: tempo de
 ecrã diário, duração e qualidade do sono, atividade física, consumo de cafeína,
 \textit{score} de fadiga mental e dados demográficos (idade, género, ocupação).
-A variável alvo, \texttt{stress\_level}, é contínua -- o que significou logo à partida
+A variável alvo, \texttt{stress\_level}, é contínua, o que significou logo à partida
 que teríamos de a transformar em categorias antes de poder treinar qualquer modelo
 de classificação.
 
@@ -192,17 +192,17 @@ discretas. Para cada cenário, definimos um objetivo e escolhemos uma estratégi
 discretização:
 
 \begin{itemize}
-  \item \textbf{Cenário A -- 2 classes}: separar os dados em ``Sem Stress'' (0) e
+  \item \textbf{Cenário A (2 classes)}: separar os dados em ``Sem Stress'' (0) e
     ``Com Stress'' (1). Usámos \textit{equal-frequency binning} com ponto de corte
     na mediana ($7.38$), porque o equilíbrio resultante ($\approx$50/50) impede que
     os modelos fiquem tendenciosos para a classe maioritária.
 
-  \item \textbf{Cenário B -- 5 classes}: dividir o stress em cinco níveis de
+  \item \textbf{Cenário B (5 classes)}: dividir o stress em cinco níveis de
     intensidade crescente (0 a 4). Aplicámos também \textit{equal-frequency binning}
     (\texttt{pd.qcut} com $q=5$), com a lógica de garantir aproximadamente o mesmo
     número de instâncias por classe.
 
-  \item \textbf{Cenário C -- 10 classes}: mesma lógica, mas com dez níveis
+  \item \textbf{Cenário C (10 classes)}: mesma lógica, mas com dez níveis
     (\texttt{pd.qcut} com $q=10$), para uma granularidade mais fina.
 \end{itemize}
 
@@ -225,7 +225,7 @@ resultante, verificámos imediatamente que algo estava errado: o Cenário B tinh
 Ao investigar a causa, percebemos que o problema estava na distribuição do próprio
 dataset: mais de 20\% dos registos têm \texttt{stress\_level} = 10.0 (o valor máximo).
 Isto faz com que o 80.º percentil seja 10.0, que é também o máximo absoluto. Para o
-Cenário B, as fronteiras do 4.º e do 5.º bin são ambas 10.0 -- idênticas. O algoritmo
+Cenário B, as fronteiras do 4.º e do 5.º bin são ambas 10.0, ou seja, idênticas. O algoritmo
 \texttt{pd.qcut}, ao detetar esta fronteira duplicada, funde automaticamente os dois
 bins superiores num só, reduzindo o número de classes de 5 para 4. No Cenário C o
 mesmo mecanismo elimina três bins superiores (os percentis 80, 90 e 100 coincidem
@@ -256,7 +256,7 @@ exatamente o número de classes pedido.
 Como se pode observar na figura, a nova estratégia cria o número correto de classes.
 No entanto, introduz um problema diferente: o número de amostras por classe ficou
 bastante desequilibrado, com a última classe a concentrar muito mais instâncias do que
-as restantes -- consequência direta do efeito de teto do dataset. Este desequilíbrio
+as restantes, consequência direta do efeito de teto do dataset. Este desequilíbrio
 será necessário endereçar antes do treino dos modelos, testando técnicas de
 \textit{oversampling} (gerar instâncias sintéticas nas classes minoritárias) ou
 \textit{undersampling} (reduzir instâncias na classe maioritária), como descrito
@@ -316,8 +316,8 @@ criámos uma segunda visualização com bins discretos:
 De seguida, construímos dois heatmaps de correlação complementares: um de
 \textbf{Pearson} e outro de \textbf{Spearman}. A razão para usarmos as duas métricas
 foi metodológica: a correlação de Pearson mede apenas relações \textit{lineares}, ao
-passo que a correlação de Spearman -- por operar sobre os \textit{ranks} dos valores
-em vez dos valores brutos -- captura qualquer relação \textbf{monotónica}, seja ela
+passo que a correlação de Spearman, por operar sobre os \textit{ranks} dos valores
+em vez dos valores brutos, captura qualquer relação \textbf{monotónica}, seja ela
 logarítmica, exponencial ou de potência. Comparar as duas permite-nos perceber quais
 as relações têm uma componente não-linear significativa.
 
@@ -339,21 +339,21 @@ Em segundo lugar, e mais interessante, \texttt{daily\_screen\_time\_hours} e
 \texttt{sleep\_quality\_score} apresentam correlação de Spearman \textit{ligeiramente
 superior} à de Pearson. O que isto significa na prática é que a relação entre estas
 variáveis e o stress não é perfeitamente proporcional (o que seria uma relação linear),
-mas cresce de forma monotónica -- por exemplo, mais tempo de ecrã \textit{tende sempre}
+mas cresce de forma monotónica: por exemplo, mais tempo de ecrã \textit{tende sempre}
 a corresponder a mais stress, mas o efeito de cada hora adicional pode não ser sempre o
 mesmo (pode ser maior no início e menor depois de certo ponto, como uma curva logarítmica).
-Esta descoberta sugere que modelos capazes de aprender fronteiras não-lineares -- como
-o kernel RBF do SVM ou as árvores do XGBoost -- têm uma vantagem natural neste dataset.
+Esta descoberta sugere que modelos capazes de aprender fronteiras não-lineares (como
+o kernel RBF do SVM ou as árvores do XGBoost) têm uma vantagem natural neste dataset.
 Para o \texttt{mental\_fatigue\_score}, a diferença entre Pearson e Spearman é quase
 nula, o que indica uma relação mais diretamente proporcional com o stress. Surpreendeu-nos também verificar que variáveis
 como a atividade física, a duração do sono e o consumo de cafeína apresentam correlações
-próximas de zero em ambas as métricas -- confirmando que a capacidade preditiva do
+próximas de zero em ambas as métricas, confirmando que a capacidade preditiva do
 dataset está essencialmente concentrada nas três variáveis-chave acima, algo que
 influenciou diretamente a nossa estratégia de feature engineering.
 
 Complementámos com um box plot do \texttt{mental\_fatigue\_score} (o preditor mais
 correlacionado com o stress) por classe, para confirmar visualmente se as classes têm
-distribuições distintas -- tanto no Cenário B (5 classes) como no Cenário C (10 classes).
+distribuições distintas, tanto no Cenário B (5 classes) como no Cenário C (10 classes).
 
 \begin{figure}[H]
   \centering
@@ -373,7 +373,7 @@ distribuições distintas -- tanto no Cenário B (5 classes) como no Cenário C 
 
 Os box plots confirmam aquilo que a análise de correlação já antecipava: há uma separação
 clara e progressiva das medianas do \texttt{mental\_fatigue\_score} ao longo das classes
-de ambos os cenários -- de baixo stress (classe 0, fadiga baixa) para stress máximo
+de ambos os cenários: de baixo stress (classe 0, fadiga baixa) para stress máximo
 (última classe, fadiga alta). As classes extremas têm distribuições bem separadas,
 enquanto as classes intermédias apresentam maior sobreposição entre si. No Cenário C,
 com 10 classes, esta sobreposição é naturalmente mais pronunciada dada a maior
@@ -409,7 +409,7 @@ a maior granularidade torna a sobreposição entre classes adjacentes mais evide
 antecipando o desafio acrescido de classificação com 10 categorias. Nas distribuições
 diagonais (KDE por classe), as classes intermédias sobrepõem-se significativamente
 entre si, mas distinguem-se das extremas. A separabilidade visual, ainda que imperfeita,
-confirmou-nos que os modelos teriam informação suficiente para aprender -- e ajudou-nos
+confirmou-nos que os modelos teriam informação suficiente para aprender, e ajudou-nos
 a calibrar as expectativas de desempenho antes de avançar para a modelação.
 
 %=============================================================
@@ -465,12 +465,12 @@ exploratória nesta fase.
 
 \begin{sloppypar}
 O gráfico confirma e quantifica o que a análise de correlação já sugeria.
-A \texttt{interacao\_ecra\_fadiga} aparece no topo da importância -- o que faz sentido,
-pois é um produto dos dois preditores mais fortes, concentrando o seu efeito combinado
--- mas será removida a seguir pelo filtro de correlação cruzada ($>0.95$ com
+A \texttt{interacao\_ecra\_fadiga} aparece no topo da importância (o que faz sentido,
+pois é um produto dos dois preditores mais fortes, concentrando o seu efeito combinado),
+mas será removida a seguir pelo filtro de correlação cruzada ($>0.95$ com
 \texttt{mental\_fatigue\_score}). Excluindo a interação, o \texttt{mental\_fatigue\_score}
 domina, seguido do \texttt{daily\_screen\_time\_hours} e do \texttt{sleep\_quality\_score}.
-Os rácios criados -- \texttt{racio\_ecra\_sono} e \texttt{racio\_atividade\_ecra} --
+Os rácios criados (\texttt{racio\_ecra\_sono} e \texttt{racio\_atividade\_ecra})
 aparecem com importância não nula, validando a decisão de os criar. As features com
 importância próxima de zero, como \texttt{caffeine\_intake\_cups} ou \texttt{age},
 confirmam o que as correlações de Pearson e Spearman já tinham revelado: neste dataset
@@ -484,12 +484,12 @@ sintético, a capacidade preditiva concentra-se em poucas variáveis-chave.
 Para avaliar os modelos de forma rigorosa, dividimos os dados em três conjuntos distintos,
 seguindo uma proporção \textbf{70/15/15} (treino/validação/teste):
 \begin{itemize}
-  \item Treino: 10\,500 instâncias -- usadas para ajustar os parâmetros dos modelos;
-  \item Validação: 2\,250 instâncias -- usadas durante a otimização de hiperparâmetros;
-  \item Teste: 2\,250 instâncias -- reservadas e intocadas até à avaliação final.
+  \item Treino: 10\,500 instâncias, usadas para ajustar os parâmetros dos modelos;
+  \item Validação: 2\,250 instâncias, usadas durante a otimização de hiperparâmetros;
+  \item Teste: 2\,250 instâncias, reservadas e intocadas até à avaliação final.
 \end{itemize}
 Em todas as divisões usámos o parâmetro \texttt{stratify}, que garante que a proporção
-de classes é mantida em cada conjunto -- decisão fundamental para que a validação
+de classes é mantida em cada conjunto, decisão fundamental para que a validação
 cruzada seja justa e representativa.
 
 \subsubsection{Normalização e Prevenção de Data Leakage}
@@ -497,8 +497,8 @@ cruzada seja justa e representativa.
 Decidimos normalizar todas as features com \texttt{StandardScaler}, porque modelos como
 o SVM são muito sensíveis à escala das variáveis e a sua performance diminui
 significativamente sem normalização. O passo crítico foi garantir que o scaler era \textit{exclusivamente}
-calculado sobre os dados de treino (\texttt{fit\_transform}) e apenas aplicado -- sem
-recalcular -- nos conjuntos de validação e teste (\texttt{transform}). Fizemo-lo assim
+calculado sobre os dados de treino (\texttt{fit\_transform}) e apenas aplicado, sem
+recalcular, nos conjuntos de validação e teste (\texttt{transform}). Fizemo-lo assim
 para evitar \textit{data leakage}: se calculássemos a média e o desvio padrão com base
 em todos os dados incluindo validação e teste, estaríamos a dar ao modelo informação
 sobre dados que ainda não deveria ter visto, inflacionando artificialmente a performance. Para reforçar
@@ -533,19 +533,16 @@ Em todos os casos, o SMOTE é aplicado \textit{apenas ao conjunto de treino}, ap
 a divisão treino/validação/teste, para evitar \textit{data leakage}. Os conjuntos de
 validação e teste mantêm a distribuição real dos dados.
 
-\paragraph{Metodologia de seleção do nível.}
 Para escolher o nível de SMOTE sem incorrer em custo computacional excessivo,
 usámos uma \textbf{Random Forest com hiperparâmetros fixos} como modelo proxy
 (200 árvores, \texttt{class\_weight=`balanced'}, sem tuning). Esta abordagem é
-justificada porque a seleção do nível de SMOTE é uma decisão de
-\textit{pré-processamento} — independente do modelo final — e a Random Forest
-fornece uma estimativa robusta da separabilidade das classes. O critério de seleção
-foi o \textbf{F1 macro no conjunto de teste} (que mantém a distribuição real).
-Escolhemos um nível por cenário, comum aos três modelos, para garantir que a
-comparação entre SVM, NN e XGBoost é feita sobre o mesmo conjunto de treino.
-
-\paragraph{Resultados da comparação.}
-As tabelas~\ref{tab:smote_b} e~\ref{tab:smote_c} resumem os resultados obtidos.
+justificada porque a seleção do nível de SMOTE é uma decisão de pré-processamento,
+independente do modelo final, e a Random Forest fornece uma estimativa robusta da
+separabilidade das classes. O critério de seleção foi o \textbf{F1 macro no conjunto
+de teste}, que mantém a distribuição real dos dados. Escolhemos um nível por cenário,
+comum aos três modelos, de forma a garantir que a comparação entre SVM, NN e XGBoost
+é feita sobre o mesmo conjunto de treino. Os resultados obtidos constam das
+Tabelas~\ref{tab:smote_b} e~\ref{tab:smote_c}.
 
 \begin{table}[H]
 \centering
@@ -583,26 +580,33 @@ SMOTE +50\%   & 13\,979 & 0.4781 & 0.4843 \\
 \end{tabular}
 \end{table}
 
-\paragraph{Decisão e justificação.}
-O Cenário A não necessita de SMOTE — as classes estão perfeitamente balanceadas
-(50\%/50\%). Para os Cenários B e C, a análise dos resultados revela padrões distintos:
+Para ilustrar visualmente o efeito do SMOTE +30\% no Cenário B, a Figura~\ref{fig:smote_comparison} mostra
+a distribuição de amostras por classe no conjunto de treino antes e depois da aplicação do oversampling.
 
-\begin{itemize}
-  \item \textbf{Cenário B — SMOTE +30\%}: o nível +30\% obteve o melhor F1 no teste
-    (0.7533), superando o baseline em cerca de +0.8 pontos percentuais. As melhorias
-    são modestas mas consistentes, o que é esperado: com 5 classes e uma proporção
-    de desequilíbrio de $\approx$1:4.6, o modelo já consegue aprender razoavelmente
-    sem resampling.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{../graficos/smote_comparison_B.png}
+  \caption{Distribuição de classes no conjunto de treino do Cenário B antes e depois do SMOTE +30\%.
+    A classe maioritária (classe~4) permanece inalterada; as restantes crescem proporcionalmente.}
+  \label{fig:smote_comparison}
+\end{figure}
 
-  \item \textbf{Cenário C — Baseline}: o SMOTE não produziu melhorias consistentes.
-    O baseline obteve o melhor F1 no teste (0.4848), e nenhum nível de oversampling
-    o superou de forma clara. Isto deve-se provavelmente ao facto de as classes mais
-    pequenas (classe~0 com apenas 463 amostras de treino) terem muito poucos vizinhos
-    reais, fazendo com que o SMOTE gere exemplos sintéticos ruidosos que prejudicam
-    mais do que ajudam. O desequilíbrio residual é gerido nos modelos finais através
-    de \texttt{class\_weight=`balanced'} (SVM e NN) e \texttt{sample\_weight}
-    (XGBoost).
-\end{itemize}
+O Cenário A não necessita de SMOTE, uma vez que as classes estão perfeitamente
+balanceadas (50\%/50\%). Para os Cenários B e C, a análise dos resultados revela
+padrões distintos.
+
+No \textbf{Cenário B}, o nível \textbf{+30\%} produziu o melhor F1 no teste (0.7533),
+superando o baseline em cerca de 0.8 pontos percentuais. As melhorias são modestas
+mas consistentes, o que é esperado: com 5 classes e uma proporção de desequilíbrio
+de $\approx$1:4.6, o modelo já consegue aprender razoavelmente sem resampling.
+
+No \textbf{Cenário C}, o SMOTE não produziu melhorias consistentes: o \textbf{baseline}
+obteve o melhor F1 no teste (0.4848) e nenhum nível de oversampling o superou de
+forma clara. Isto deve-se provavelmente ao facto de as classes mais pequenas
+(classe~0 com apenas 463 amostras de treino) terem muito poucos vizinhos reais,
+fazendo com que o SMOTE gere exemplos sintéticos ruidosos. O desequilíbrio residual
+é gerido nos modelos finais através de \texttt{class\_weight=`balanced'} no SVM e
+na NN, e de \texttt{sample\_weight} no XGBoost.
 
 \subsection{Métricas de Avaliação}
 
@@ -622,28 +626,34 @@ C (10 Classes) & F1-Score (macro) & Top-2 Accuracy, Weighted F1, Cohen's Kappa \
 \end{longtable}
 
 Escolhemos o \textbf{F1-Score macro} como métrica principal porque trata todas as classes
-de forma igualitária, independentemente da sua frequência -- penalizando os modelos que
+de forma igualitária, independentemente da sua frequência, penalizando os modelos que
 ignoram classes minoritárias. O \textbf{Cohen's Kappa} complementa ao medir a concordância
 acima do que seria esperado por acaso. O \textbf{MCC} é particularmente robusto a
 desequilíbrios. Para o Cenário C, acrescentámos ainda a \textbf{Top-2 Accuracy}, que
-considera uma previsão correta se a classe verdadeira estiver entre as duas mais prováveis
--- útil num problema de 10 classes onde o erro de um nível adjacente tem pouco significado
+considera uma previsão correta se a classe verdadeira estiver entre as duas mais prováveis,
+útil num problema de 10 classes onde o erro de um nível adjacente tem pouco significado
 prático.
 
 \subsection{Modelos Implementados}
 
 Para a escolha dos três modelos, o enunciado tornava o SVM e a Rede Neuronal obrigatórios.
-Para o terceiro, tivemos de justificar a nossa opção. Depois de pesquisar a literatura --
-em particular o trabalho de Huang et al.\ \cite{huang2024} que mostrou o XGBoost como
-melhor algoritmo num problema semelhante -- optámos pelo XGBoost. A seguir descrevemos
-as nossas decisões de implementação para cada modelo.
+Para o terceiro, tivemos de justificar a nossa opção. Depois de pesquisar a literatura (em particular o trabalho de Huang et al.\ \cite{huang2024}
+que mostrou o XGBoost como melhor algoritmo num problema semelhante), optámos pelo XGBoost.
+
+O XGBoost (\textit{eXtreme Gradient Boosting}) \cite{chen2016} é um método de
+\textit{ensemble} que combina sequencialmente várias árvores de decisão, onde cada
+árvore corrige os erros da anterior. Inclui regularização nativa para controlar o
+overfitting e tem demonstrado resultados consistentemente fortes em dados tabulares
+estruturados como os nossos \cite{shwartz2022}.
+
+A seguir descrevemos as nossas decisões de implementação para cada modelo.
 
 \subsubsection{Support Vector Machine (SVM)}
 
 O SVM \cite{cortes1995} foi incluído por obrigação, mas também por convicção: trata-se de
 um modelo com fortes garantias teóricas (minimização do risco estrutural) que se adequa
 bem ao nosso problema. A razão principal é que os limites entre classes comportamentais
-como ``stress moderado'' e ``stress alto'' são intrinsecamente ruidosos e difusos -- e a
+como ``stress moderado'' e ``stress alto'' são intrinsecamente ruidosos e difusos, e a
 maximização da margem do SVM confere exactamente o tipo de robustez necessária nestes
 casos. Além disso, o kernel RBF permite capturar as interações não-lineares entre sono,
 ecrã e atividade física sem requerer que as criemos manualmente.
@@ -652,13 +662,14 @@ ecrã e atividade física sem requerer que as criemos manualmente.
 \begin{itemize}
   \item Encapsulámos o modelo num \texttt{Pipeline([StandardScaler, SVC])} para prevenir
     data leakage durante a validação cruzada;
-  \item Kernel RBF: $K(x,x') = e^{-\gamma\|x-x'\|^2}$;
+  \item Kernel RBF: mede a similaridade entre dois pontos com base na distância entre eles no espaço de features, permitindo capturar fronteiras não-lineares;
   \item \texttt{class\_weight='balanced'} para compensar o desequilíbrio de classes;
   \item \texttt{probability=True} (necessário para calcular o ROC-AUC);
-  \item Para o tuning, usámos \textbf{GridSearchCV} com 12 combinações:
-    $C \in \{0.1, 1, 10\}$, $\gamma \in \{\text{scale}, \text{auto}\}$ e
-    kernel $\in \{\text{rbf}, \text{linear}\}$ -- espaço suficientemente pequeno
-    para explorar exaustivamente sem custo computacional excessivo.
+  \item Para o tuning, usámos \textbf{GridSearchCV} com 12 combinações de
+    hiperparâmetros: regularização ($C$), largura do kernel ($\gamma$) e tipo de kernel
+    (RBF vs.\ linear). Optámos pelo GridSearch em vez do RandomizedSearch porque o espaço
+    é pequeno o suficiente para ser explorado exaustivamente em tempo razoável, garantindo
+    que encontramos a melhor combinação e não apenas uma aproximação.
 \end{itemize}
 
 \subsubsection{Rede Neuronal (MLPClassifier)}
@@ -668,37 +679,54 @@ algo que os outros dois modelos não têm: a capacidade de aprender representaç
 hierárquicas dos dados de forma completamente automática, o que é valioso quando as
 relações entre features são complexas e difíceis de especificar à mão.
 
-Para a arquitetura, optámos por duas camadas ocultas, equilibrando capacidade expressiva
-com risco de overfitting:
-\[
-\text{Input} \rightarrow \text{Dense}(128, \text{ReLU}) \rightarrow \text{Dense}(64, \text{ReLU}) \rightarrow \text{Output}(N, \text{Softmax})
-\]
+Para a arquitetura, optámos por duas camadas ocultas (128 e 64 neurónios).
+Uma única camada pode não ter capacidade suficiente para aprender relações complexas
+entre as features, enquanto arquiteturas muito profundas aumentam o risco de overfitting
+e o custo computacional sem benefício proporcional para um dataset desta dimensão.
+Duas camadas representam um equilíbrio razoável: a primeira aprende representações
+mais gerais dos dados e a segunda refina-as antes da classificação final.
 
 \textbf{Implementação}:
 \begin{itemize}
-  \item Optimizer Adam (\texttt{lr=0.001}) pela sua convergência adaptativa;
-  \item Regularização L2 (\texttt{alpha=1e-4}) para controlar o overfitting;
-  \item EarlyStopping com \textit{patience}=10 para parar quando a melhoria
-    na validação interna estagnar;
+  \item \textbf{Optimizer Adam} (\texttt{lr=0.001}): o otimizador é o algoritmo que
+    controla como os pesos da rede são atualizados a cada iteração. O Adam ajusta
+    automaticamente a taxa de aprendizagem para cada peso individualmente, o que acelera
+    a convergência face a alternativas mais simples como o gradiente descendente clássico.
+    O valor \texttt{lr=0.001} é o passo de atualização inicial, um valor padrão
+    amplamente usado na literatura;
+  \item \textbf{Regularização L2} (\texttt{alpha=1e-4}): penaliza pesos muito grandes
+    na rede, forçando o modelo a soluções mais simples e menos propensas a memorizar o
+    conjunto de treino em vez de generalizar. O valor \texttt{1e-4} é uma regularização
+    leve, suficiente para estabilizar o treino sem comprometer a capacidade da rede;
+  \item \textbf{Early Stopping} com \textit{patience}=10: interrompe o treino
+    automaticamente quando o desempenho na validação interna deixa de melhorar durante
+    10 épocas consecutivas. Evita que a rede continue a treinar depois de atingir o seu
+    ponto ótimo, prevenindo overfitting sem necessidade de fixar manualmente o número
+    de épocas;
   \item Para o tuning, escolhemos \textbf{RandomizedSearchCV} com 15 combinações:
     o espaço de hiperparâmetros de uma rede neuronal (neurónios, taxa de aprendizagem,
     regularização) é demasiado vasto para explorar exaustivamente, e a pesquisa aleatória
     é empiricamente eficiente nestes casos.
 \end{itemize}
 
-\subsubsection{XGBoost -- 3.º Modelo}
+\subsubsection{XGBoost: 3.º Modelo}
 
 O XGBoost \cite{chen2016} foi o nosso modelo de escolha livre, e fizemo-lo por quatro
 razões que se complementam:
 \begin{enumerate}
   \item \textbf{Adequação a dados tabulares}: os nossos dados têm exactamente o formato
-    em que o XGBoost costuma destacar-se -- tabular, estruturado, com features numéricas
-    e categóricas -- como demonstrado empiricamente por Shwartz-Ziv \& Armon \cite{shwartz2022};
+    em que o XGBoost costuma destacar-se (tabular, estruturado, com features numéricas
+    e categóricas), como demonstrado empiricamente por Shwartz-Ziv \& Armon \cite{shwartz2022};
   \item \textbf{Robustez sem normalização}: ao contrário do SVM, o XGBoost não precisa
     que as features estejam na mesma escala, o que simplifica o pipeline;
   \item \textbf{Interpretabilidade via SHAP}: dado que o nosso problema tem potencial
     aplicação em contextos de saúde, quisemos poder explicar cada previsão individualmente
-    -- algo que o XGBoost facilita de forma nativa através dos SHAP values;
+    e o XGBoost facilita isso de forma nativa através dos SHAP values. Os SHAP values
+    (\textit{SHapley Additive exPlanations}) quantificam a contribuição de cada
+    feature para uma previsão concreta: um valor positivo indica que aquela feature
+    empurrou a previsão para uma classe de stress mais alta, e um valor negativo para
+    uma mais baixa. Isto permite explicar individualmente cada caso em vez de apenas
+    reportar métricas globais;
   \item \textbf{Evidência na literatura}: Huang et al.\ \cite{huang2024} mostraram
     que o XGBoost supera SVM, KNN e ANN num problema quase idêntico ao nosso.
 \end{enumerate}
@@ -708,9 +736,43 @@ razões que se complementam:
   \item \texttt{objective='multi:softprob'} para multiclasse;
   \item \texttt{sample\_weight='balanced'} para compensar o desequilíbrio;
   \item \texttt{early\_stopping\_rounds} para parar quando o modelo deixar de melhorar;
-  \item \textbf{RandomizedSearchCV} com 20 combinações aleatórias -- pela mesma
+  \item \textbf{RandomizedSearchCV} com 20 combinações aleatórias, pela mesma
     razão da MLP: o espaço de hiperparâmetros é demasiado grande para exploração exaustiva.
 \end{itemize}
+
+\subsubsection{Ensemble de Redes Neuronais (PyTorch)}
+
+Como extensão ao MLPClassifier do scikit-learn, implementámos um \textbf{ensemble de redes
+neuronais em PyTorch} \cite{paszke2019}. A motivação é dupla: por um lado, o PyTorch permite
+adicionar \textbf{Dropout} real entre camadas, que é uma forma de regularização mais eficaz
+do que a L2 isolada (o Dropout desativa aleatoriamente neurónios durante o treino, obrigando
+a rede a aprender representações redundantes e mais robustas); por outro, um ensemble de
+múltiplas redes reduz a variância das previsões.
+
+O ensemble é composto por \textbf{5 redes com arquiteturas diversas} para maximizar a
+diversidade das previsões, cobrindo o mesmo espaço explorado pelo RandomizedSearchCV
+da MLP individual:
+
+\begin{table}[H]
+\centering
+\caption{Configurações das 5 redes do ensemble PyTorch.}
+\begin{tabular}{cccc}
+\toprule
+\textbf{Rede} & \textbf{Camadas ocultas} & \textbf{LR} & \textbf{Dropout} \\
+\midrule
+1 & (128, 64)       & 0.001 & 0.1 \\
+2 & (256, 128, 64)  & 0.001 & 0.1 \\
+3 & (128, 64)       & 0.0005 & 0.2 \\
+4 & (64, 32)        & 0.001 & 0.1 \\
+5 & (256, 128)      & 0.001 & 0.1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A previsão final é a média das probabilidades \textit{softmax} das 5 redes. Todas as redes
+usam o otimizador Adam com \texttt{weight\_decay=1e-4} (regularização L2) e early stopping
+com \textit{patience}=20. As configurações são as mesmas para os três cenários, sem tuning
+por cenário.
 
 \subsection{Validação Cruzada}
 
@@ -730,7 +792,7 @@ tuning) são os seguintes:
 
 \begin{table}[H]
 \centering
-\caption{Cross-Validation Baseline -- F1 Macro ($\mu \pm \sigma$, 5 folds)}
+\caption{Cross-Validation Baseline: F1 Macro ($\mu \pm \sigma$, 5 folds)}
 \begin{tabular}{lccc}
 \toprule
 \textbf{Modelo} & \textbf{Cenário A} & \textbf{Cenário B} & \textbf{Cenário C} \\
@@ -759,13 +821,13 @@ avançar para o tuning de hiperparâmetros.
 \subsection{Resultados no Conjunto de Teste (Hold-out)}
 
 Depois de treinar e afinar todos os modelos, chegou o momento de os avaliar sobre o
-conjunto de teste -- as 2\,250 instâncias que tínhamos reservado desde o início e que
+conjunto de teste: as 2\,250 instâncias que tínhamos reservado desde o início e que
 nenhum modelo alguma vez tinha visto. Esta é a avaliação que consideramos definitiva,
 porque reflete o desempenho real em dados completamente novos.
 
 \begin{table}[H]
 \centering
-\caption{Resultados finais no conjunto de teste hold-out -- métricas por modelo e cenário.}
+\caption{Resultados finais no conjunto de teste hold-out: métricas por modelo e cenário.}
 \label{tab:test_results}
 \begin{tabular}{llccccc}
 \toprule
@@ -796,9 +858,9 @@ NN/MLP  & C & 0.5700          & 0.6351          & 0.5655 & 0.5656 & 0.9361 \\
 
 Para além dos números agregados, analisámos as matrizes de confusão de cada modelo em
 cada cenário, com o objetivo de perceber \textit{onde} especificamente os modelos erram
--- e não apenas \textit{quanto}.
+e não apenas \textit{quanto}.
 
-\subsubsection{Cenário A -- Classificação Binária}
+\subsubsection{Cenário A: Classificação Binária}
 
 \begin{figure}[H]
 \centering
@@ -814,17 +876,17 @@ cada cenário, com o objetivo de perceber \textit{onde} especificamente os model
   \includegraphics[width=\textwidth]{../graficos/cm_xgboost_A.png}
   \caption{XGBoost}
 \end{subfigure}
-\caption{Confusion matrices normalizadas -- Cenário A (Binário).}
+\caption{Confusion matrices normalizadas: Cenário A (Binário).}
 \end{figure}
 
 As matrizes do Cenário A revelam um desempenho muito uniforme entre os três modelos.
 A diagonal principal está claramente dominante em todos os casos, com taxas de acerto
-entre 94\% e 96\% para ambas as classes. O padrão de erros é simétrico -- os falsos
-positivos e falsos negativos têm magnitudes comparáveis -- o que confirma que o uso de
+entre 94\% e 96\% para ambas as classes. O padrão de erros é simétrico: os falsos
+positivos e falsos negativos têm magnitudes comparáveis, o que confirma que o uso de
 \texttt{class\_weight='balanced'} funcionou como esperado e que os modelos não estão
 enviesados para nenhuma das classes.
 
-\subsubsection{Cenário B -- 5 Classes}
+\subsubsection{Cenário B: 5 Classes}
 
 \begin{figure}[H]
 \centering
@@ -840,11 +902,11 @@ enviesados para nenhuma das classes.
   \includegraphics[width=\textwidth]{../graficos/cm_xgboost_B.png}
   \caption{XGBoost}
 \end{subfigure}
-\caption{Confusion matrices normalizadas -- Cenário B (5 Classes).}
+\caption{Confusion matrices normalizadas: Cenário B (5 Classes).}
 \end{figure}
 
 No Cenário B, as matrizes expõem um padrão claro e esperado: as \textbf{classes extremas
-(0 e 4)} são classificadas com mais precisão -- a diagonal nestas linhas é mais intensa --
+(0 e 4)} são classificadas com mais precisão (a diagonal nestas linhas é mais intensa),
 enquanto as \textbf{classes intermédias (1, 2 e 3)} mostram confusão maioritariamente
 \textit{lateral} (entre classes vizinhas), raramente saltando mais de uma posição. Este
 comportamento é semanticamente coerente: distinguir stress ``sem'' de stress ``extremo''
@@ -852,7 +914,7 @@ comportamento é semanticamente coerente: distinguir stress ``sem'' de stress ``
 comportamentais são subtis. A SVM, que obteve o melhor resultado neste cenário, apresenta
 a diagonal mais limpa das três.
 
-\subsubsection{Cenário C -- 10 Classes}
+\subsubsection{Cenário C: 10 Classes}
 
 \begin{figure}[H]
 \centering
@@ -868,24 +930,26 @@ a diagonal mais limpa das três.
   \includegraphics[width=\textwidth]{../graficos/cm_xgboost_C.png}
   \caption{XGBoost}
 \end{subfigure}
-\caption{Confusion matrices normalizadas -- Cenário C (10 Classes).}
+\caption{Confusion matrices normalizadas: Cenário C (10 Classes).}
 \end{figure}
 
 No Cenário C, as matrizes ficam visivelmente mais densas, mas o padrão de erros tem
 uma estrutura importante: é \textbf{diagonal-bandlike}, ou seja, os erros concentram-se
 quase exclusivamente nas classes adjacentes e não em saltos arbitrários entre classes
-distantes. Isto revela que os modelos capturam a natureza ordinal do stress -- sabem
-que nível 5 está ``próximo'' de nível 6 -- mesmo sem qualquer indicação explícita desta
+distantes. Isto revela que os modelos capturam a natureza ordinal do stress: sabem
+que nível 5 está ``próximo'' de nível 6, mesmo sem qualquer indicação explícita desta
 ordem durante o treino. A diagonal principal, ainda que menos intensa do que nos cenários
 anteriores, permanece a região mais escura de cada linha, confirmando que os modelos
 aprendem de facto.
 
-\subsection{Curvas de Loss -- Rede Neuronal}
+\subsection{Curvas de Loss da Rede Neuronal}
 
 Para a rede neuronal, monitorizar a curva de loss ao longo do treino foi importante para
 verificar se o modelo estava a convergir de forma estável ou se apresentava sinais de
-overfitting (divergência entre treino e validação). Ficámos satisfeitos com o que observámos:
-convergência suave e sem oscilações em todos os três cenários.
+overfitting. A curva de loss regista, época a época, o erro cometido pelo modelo durante
+o treino: idealmente, esse erro desce progressivamente à medida que a rede aprende.
+Quando a loss de treino continua a descer mas a loss de validação começa a subir, isso
+é sinal de overfitting — o modelo está a memorizar o treino em vez de generalizar. Ficámos globalmente satisfeitos com o que observámos, embora com nuances por cenário.
 
 \begin{figure}[H]
 \centering
@@ -901,23 +965,24 @@ convergência suave e sem oscilações em todos os três cenários.
   \includegraphics[width=\textwidth]{../graficos/loss_curve_nn_C.png}
   \caption{Cenário C}
 \end{subfigure}
-\caption{Curvas de loss da MLP nos três cenários. A convergência sem divergência
-  indica treino estável e ausência de overfitting grosseiro.}
+\caption{Curvas de loss da MLP nos três cenários. A loss de treino converge de forma estável
+  em todos os cenários; o val score no Cenário A apresenta oscilações mas sem divergência.}
 \end{figure}
 
-Nos três cenários, a loss de treino e a loss de validação convergem de forma monotónica
-e sem divergência -- sinal claro de treino estável. A distância mínima entre as duas
-curvas em todos os cenários indica que o modelo não está a fazer overfitting: o limite
-de desempenho não é imposto pela capacidade do modelo, mas sim pelo ruído estrutural
-presente nas fronteiras entre classes. No Cenário C, a loss de validação estabiliza
-num valor mais elevado do que nos Cenários A e B, o que reflete a maior dificuldade
-intrínseca do problema com 10 classes -- e que depois confirmámos com as learning curves.
-A convergência precoce observada em A, com poucas épocas até estabilização, evidencia
-que o problema binário é muito mais simples para a rede do que os cenários multiclasse.
+Nos três cenários, a loss de treino desce de forma estável e não se observa divergência
+entre treino e validação, o que exclui overfitting grosseiro. No entanto, o comportamento
+não é uniforme: no \textbf{Cenário A}, o val score (linha laranja) apresenta oscilações
+consideráveis ao longo das épocas, refletindo a instabilidade natural da estimativa de
+F1 num conjunto de validação interno pequeno com apenas duas classes — ainda assim, a
+loss de treino converge sem problemas e o desempenho final é elevado. Nos
+\textbf{Cenários B e C}, o val score estabiliza de forma mais suave, o que é coerente
+com a maior dimensão do problema de classificação. No Cenário C, a loss de validação
+estabiliza num valor mais elevado do que nos restantes, refletindo a maior dificuldade
+intrínseca do problema com 10 classes.
 
 \subsection{Análise Crítica por Cenário}
 
-\subsubsection{Cenário A -- Classificação Binária}
+\subsubsection{Cenário A: Classificação Binária}
 
 Ficámos genuinamente satisfeitos com os resultados do Cenário A: os três modelos atingem
 F1 macro entre 0.946 e 0.950, o que representa um \textbf{desempenho excelente} para um
@@ -925,14 +990,14 @@ problema com dados sintéticos. A \textbf{NN/MLP} surpreendeu-nos ao superar mar
 os outros dois (F1=0.9502), seguida do SVM (0.9476) e do XGBoost (0.9462).
 
 Ao inspecionar as matrizes de confusão, verificámos que os erros são simétricos entre
-as duas classes ($\approx$5\% FP e $\approx$4\% FN) -- ou seja, o modelo não está
+as duas classes ($\approx$5\% FP e $\approx$4\% FN), ou seja, o modelo não está
 sistematicamente a errar mais numa direção do que na outra. Isso confirmou que a nossa
 decisão de usar \texttt{class\_weight='balanced'} foi acertada. Comparando com a literatura
 (Tabela~\ref{tab:background_comp}), os nossos 95\% ficam ligeiramente abaixo dos 98\%
 de Lei et al.\ \cite{lei2024}, o que é expectável dado que o seu dataset apresenta
 maior separabilidade de classes.
 
-\subsubsection{Cenário B -- 5 Classes}
+\subsubsection{Cenário B: 5 Classes}
 
 No Cenário B, o desempenho desceu para F1 $\approx$ 0.81--0.82, o que consideramos
 razoável para um problema de 5 classes. Ao analisar as matrizes de confusão, encontrámos
@@ -942,17 +1007,17 @@ um padrão interessante que nos ajudou a perceber melhor o problema:
     ($\approx$87--95\%), porque têm perfis de features muito distintos dos restantes;
   \item As \textbf{classes intermédias (1, 2 e 3)} são confundidas entre si
     (F1$\approx$0.72--0.73), o que faz sentido: uma pessoa com stress ``baixo'' e uma
-    com stress ``moderado'' têm comportamentos muito semelhantes -- a fronteira entre elas
+    com stress ``moderado'' têm comportamentos muito semelhantes e a fronteira entre elas
     é genuinamente ambígua.
 \end{itemize}
 
 O facto de o \textbf{SVM} ter obtido o melhor resultado no Cenário B (F1=0.8229) foi uma
 surpresa. Verificámos que o GridSearch selecionou o \textbf{kernel linear} em vez do
-RBF default -- o que sugere que, após normalização, o espaço de features é aproximadamente
+RBF default, o que sugere que, após normalização, o espaço de features é aproximadamente
 linearmente separável para as 5 classes, e que a margem máxima do SVM linear se revelou
 mais robusta do que as fronteiras não-lineares do XGBoost neste contexto.
 
-\subsubsection{Cenário C -- Trade-offs de Granularidade (10 Classes)}
+\subsubsection{Cenário C: Trade-offs de Granularidade (10 Classes)}
 
 O Cenário C foi o mais desafiante e, honestamente, o mais revelador. O F1 macro desceu
 para $\approx$0.57--0.58, o que à primeira vista pode parecer fraco, mas que analisámos
@@ -973,7 +1038,7 @@ Para perceber melhor o problema, analisámos as \textbf{Learning Curves} do XGBo
 do Cenário C ($\sim$0.60) é intrínseco ao problema e não seria superado com mais dados.
 A ausência de divergência entre treino e validação excluiu overfitting como causa.
 Um dado reconfortante: a \textbf{Top-2 Accuracy} supera os 85\%, o que significa que
-o modelo raramente erra por mais de um nível -- um erro aceitável numa escala de 10.
+o modelo raramente erra por mais de um nível, um erro aceitável numa escala de 10.
 
 \begin{figure}[H]
   \centering
@@ -1008,7 +1073,7 @@ nos levou a conclusões concretas:
     a MLP do scikit-learn conseguiu alcançar.
   \item \textbf{SVM}: foi o melhor no Cenário B (F1=0.8229) e manteve-se sempre
     competitivo. A sua principal desvantagem que observámos foi o custo computacional
-    -- o treino foi significativamente mais lento do que os outros dois modelos,
+sendo que o treino foi significativamente mais lento do que os outros dois modelos,
     especialmente com kernel RBF ($O(n^2)$).
   \item \textbf{XGBoost}: foi o melhor no Cenário C (F1=0.5819) e segundo no A.
     Foi também o mais rápido e estável a treinar, graças ao early stopping e à
@@ -1019,12 +1084,42 @@ nos levou a conclusões concretas:
 \subsection{Efeito do Tuning de Hiperparâmetros}
 
 Uma observação que consideramos importante partilhar é que a melhoria obtida com o tuning
-de hiperparâmetros foi modesta -- tipicamente entre $+$0.5\% e $+$1.5\% em F1. Isso
+de hiperparâmetros foi modesta, tipicamente entre $+$0.5\% e $+$1.5\% em F1. Isso
 diz-nos que os hiperparâmetros default dos algoritmos já são razoáveis para este tipo
 de dataset, e que o esforço de otimização não foi o fator determinante na qualidade
 dos resultados. A contribuição mais valiosa do GridSearch/RandomizedSearch foi
 a seleção do \textbf{kernel linear no SVM} em detrimento do RBF default, que se
 revelou mais adequado para os Cenários B e C.
+
+\subsection{Ensemble de Redes Neuronais (PyTorch)}
+
+A Tabela~\ref{tab:ensemble_results} compara o ensemble PyTorch com a MLP individual do
+scikit-learn no conjunto de teste.
+
+\begin{table}[H]
+\centering
+\caption{Comparação do ensemble PyTorch com a MLP sklearn no conjunto de teste (F1 macro).}
+\label{tab:ensemble_results}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Modelo} & \textbf{Cenário A} & \textbf{Cenário B} & \textbf{Cenário C} \\
+\midrule
+NN/MLP sklearn (tuned) & \textbf{0.9502} & 0.8124 & 0.5700 \\
+Ensemble PyTorch       & 0.9489          & 0.7572 & 0.4932 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+No \textbf{Cenário A}, o ensemble atinge 0.9489, praticamente idêntico à MLP individual
+(diferença de 0.001), confirmando que os dois modelos capturam o problema binário com
+a mesma eficácia. Nos \textbf{Cenários B e C}, o ensemble fica abaixo da MLP sklearn. O tuning
+específico por cenário não foi realizado por duas razões: o ensemble é uma das últimas
+matérias lecionadas na disciplina, pelo que a sua implementação ocorreu nos últimos dias
+do projeto, não deixando tempo útil suficiente para realizar o tuning; além disso,
+afinar um ensemble de redes neuronais exige um poder computacional e um número de
+treinos consideravelmente superior ao de um modelo individual. As configurações fixas
+usadas representam uma escolha razoável mas não otimizada, sendo o tuning específico
+por cenário identificado como trabalho futuro.
 
 \subsection{Interpretabilidade Local (SHAP)}
 
@@ -1034,16 +1129,16 @@ aplicámos \textbf{SHAP (SHapley Additive exPlanations)} ao XGBoost, que nos per
 o impacto de cada feature em cada instância individual.
 
 O resultado (Figura~\ref{fig:shap_xgb}) confirmou a nossa intuição: o
-\texttt{mental\_fatigue\_score} é o preditor de longe mais impactante -- valores elevados
+\texttt{mental\_fatigue\_score} é o preditor de longe mais impactante: valores elevados
 empurram consistentemente a previsão para uma classe de stress superior. Mas o que nos
 agradou particularmente foi ver que os rácios \texttt{ratio\_usage\_sleep} e
-\texttt{ratio\_activity\_usage} -- as features que criámos nós próprios -- também emergem
+\texttt{ratio\_activity\_usage}, as features que criámos nós próprios, também emergem
 como relevantes. Isso validou retroativamente a nossa decisão de os criar.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.7\textwidth]{../graficos/shap_xgb_A.png}
-  \caption{SHAP Summary Plot -- XGBoost, Cenário A. Cada ponto representa uma instância;
+  \caption{SHAP Summary Plot: XGBoost, Cenário A. Cada ponto representa uma instância;
     a posição horizontal indica a direção e magnitude do impacto no output do modelo.}
   \label{fig:shap_xgb}
 \end{figure}
@@ -1058,7 +1153,7 @@ aplicámos dois testes estatísticos complementares.
 
 \begin{table}[H]
 \centering
-\caption{Resultados do teste de McNemar -- valor-$p$ (exact). $\star$ = $p < 0.05$.}
+\caption{Resultados do teste de McNemar: valor-$p$ (exact). $\star$ = $p < 0.05$.}
 \begin{tabular}{lccc}
 \toprule
 \textbf{Par} & \textbf{Cenário A} & \textbf{Cenário B} & \textbf{Cenário C} \\
@@ -1073,7 +1168,7 @@ NN  vs XGB   & 0.0912 & 0.3723 & 0.2433 \\
 O único resultado estatisticamente significativo que encontrámos foi a diferença entre
 \textbf{SVM e NN no Cenário C} ($p = 0.044$): estes dois modelos erram em instâncias
 diferentes de forma assimétrica, o que não é explicável por acaso. Nos restantes cenários,
-os três modelos não diferem significativamente -- o que é consistente com a proximidade
+os três modelos não diferem significativamente, o que é consistente com a proximidade
 dos seus valores de F1 e nos disse que, para os Cenários A e B, qualquer dos três modelos
 seria igualmente válido para produção.
 
@@ -1117,10 +1212,10 @@ No que toca à literatura académica, os nossos resultados no Cenário A (F1 = 0
 ficam próximos dos 0.98 reportados por Lei et al.\ \cite{lei2024} com Random Forest.
 A diferença é pequena e explicável: o dataset de Lei et al.\ contém apenas variáveis
 de sono, o que torna as classes mais facilmente separáveis. O nosso dataset inclui
-também tempo de ecrã e atividade física -- variáveis que, apesar de informativas,
+também tempo de ecrã e atividade física, variáveis que, apesar de informativas,
 tornam o espaço de decisão mais complexo.
 Comparativamente ao trabalho de Huang et al.\ \cite{huang2024} (XGBoost, 90.66\%),
-os nossos modelos ficam acima -- o que é encorajador, dado que utilizámos dados e
+os nossos modelos ficam acima, o que é encorajador dado que utilizámos dados e
 variáveis estruturalmente semelhantes.
 O resultado de Acosta et al.\ \cite{acosta2025} ($>$98\%) é claramente superior,
 mas é uma comparação injusta: sensores físicos contínuos (frequência cardíaca,
@@ -1157,18 +1252,18 @@ rigor metodológico.
 
 Os principais resultados que obtivemos foram:
 \begin{itemize}
-  \item F1 macro de $\approx$0.95 no Cenário A -- a \textbf{NN/MLP} superou ligeiramente
+  \item F1 macro de $\approx$0.95 no Cenário A, onde a \textbf{NN/MLP} superou ligeiramente
     os outros dois (0.9502), o que foi uma surpresa positiva, e coloca o nosso trabalho
     a par da literatura para datasets sintéticos comportamentais;
-  \item F1 macro de $\approx$0.82 no Cenário B -- o \textbf{SVM} destacou-se (0.8229),
+  \item F1 macro de $\approx$0.82 no Cenário B, onde o \textbf{SVM} se destacou (0.8229),
     com a confusão esperada nas classes intermédias que identificámos e explicámos;
-  \item F1 macro de $\approx$0.58 no Cenário C -- o \textbf{XGBoost} liderou (0.5819),
+  \item F1 macro de $\approx$0.58 no Cenário C, onde o \textbf{XGBoost} liderou (0.5819),
     mas reconhecemos que este cenário representa um problema difícil por natureza e não
     por falha dos modelos.
 \end{itemize}
 
 Os testes de McNemar que realizámos revelaram que apenas a diferença SVM vs.\ NN no
-Cenário C é estatisticamente significativa ($p = 0.044$) -- nos outros cenários, os três
+Cenário C é estatisticamente significativa ($p = 0.044$); nos outros cenários, os três
 modelos são equivalentes entre si. Comparando com a literatura, os nossos resultados
 são consistentes com os trabalhos sobre dados sintéticos de stress/sono \cite{lei2024},
 embora naturalmente abaixo dos obtidos com sinais fisiológicos reais \cite{acosta2025}.
@@ -1179,15 +1274,12 @@ com Dropout (via PyTorch) para melhorar o Cenário B; (iii) reformulação do Ce
 como regressão ordinal, que seria semanticamente mais adequado para uma escala contínua.
 
 %=============================================================
-\section*{Agradecimentos / AI Disclaimer}
+\section*{Utilização de Inteligência Artificial}
 %=============================================================
 
-O assistente de IA \textbf{Claude (Anthropic)} foi utilizado para auxiliar na geração
-de código Python (scripts \texttt{data\_pipeline.py}, \texttt{model\_*.py},
-\texttt{evaluation\_pipeline.py} e \texttt{utils.py}) e na produção e revisão deste
-relatório LaTeX.
-Toda a análise crítica, decisões metodológicas e interpretação dos resultados
-foram revistas e validadas pelos autores.
+No desenvolvimento deste projeto foi utilizado o modelo \textbf{Claude Sonnet 4.7}
+da \textbf{Anthropic} como ferramenta de apoio para auxiliar e otimizar o desenvolvimento do projeto. Todas as decisões
+metodológicas, interpretações e conclusões foram revistas e validadas pelos autores.
 
 %=============================================================
 \begin{thebibliography}{9}
@@ -1211,6 +1303,11 @@ XGBoost: A Scalable Tree Boosting System.
 Shwartz-Ziv, R. \& Armon, A. (2022).
 Tabular data: Deep learning is not all you need.
 \textit{Information Fusion}, 81, 84--90.
+
+\bibitem{paszke2019}
+Paszke, A. et al. (2019).
+PyTorch: An Imperative Style, High-Performance Deep Learning Library.
+\textit{Advances in Neural Information Processing Systems}, 32.
 
 \bibitem{pedregosa2011}
 Pedregosa, F. et al. (2011).

@@ -49,78 +49,86 @@
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.2}Normalização e Prevenção de Data Leakage}{11}{subsubsection.4.2.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.3}Lidar com o Desequilíbrio de Classes}{11}{subsubsection.4.2.3}\protected@file@percent }
 \newlabel{sec:imbalance}{{4.2.3}{11}{Lidar com o Desequilíbrio de Classes}{subsubsection.4.2.3}{}}
-\@writefile{toc}{\contentsline {paragraph}{Metodologia de seleção do nível.}{12}{section*.11}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Resultados da comparação.}{12}{section*.12}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Impacto do SMOTE no Cenário B (5 classes) — modelo proxy: Random Forest.}}{12}{table.caption.13}\protected@file@percent }
-\newlabel{tab:smote_b}{{3}{12}{Impacto do SMOTE no Cenário B (5 classes) — modelo proxy: Random Forest}{table.caption.13}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Impacto do SMOTE no Cenário C (10 classes) — modelo proxy: Random Forest.}}{12}{table.caption.14}\protected@file@percent }
-\newlabel{tab:smote_c}{{4}{12}{Impacto do SMOTE no Cenário C (10 classes) — modelo proxy: Random Forest}{table.caption.14}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Impacto do SMOTE no Cenário B (5 classes) — modelo proxy: Random Forest.}}{12}{table.caption.11}\protected@file@percent }
+\newlabel{tab:smote_b}{{3}{12}{Impacto do SMOTE no Cenário B (5 classes) — modelo proxy: Random Forest}{table.caption.11}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Impacto do SMOTE no Cenário C (10 classes) — modelo proxy: Random Forest.}}{12}{table.caption.12}\protected@file@percent }
+\newlabel{tab:smote_c}{{4}{12}{Impacto do SMOTE no Cenário C (10 classes) — modelo proxy: Random Forest}{table.caption.12}{}}
 \gdef \LT@ii {\LT@entry 
     {1}{85.95897pt}\LT@entry 
     {1}{116.09033pt}\LT@entry 
     {1}{211.16928pt}}
-\citation{huang2024}
-\citation{cortes1995}
-\@writefile{toc}{\contentsline {paragraph}{Decisão e justificação.}{13}{section*.15}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Distribuição de classes no conjunto de treino do Cenário B antes e depois do SMOTE +30\%. A classe maioritária (classe~4) permanece inalterada; as restantes crescem proporcionalmente.}}{13}{figure.caption.13}\protected@file@percent }
+\newlabel{fig:smote_comparison}{{9}{13}{Distribuição de classes no conjunto de treino do Cenário B antes e depois do SMOTE +30\%. A classe maioritária (classe~4) permanece inalterada; as restantes crescem proporcionalmente}{figure.caption.13}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Métricas de Avaliação}{13}{subsection.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Modelos Implementados}{13}{subsection.4.4}\protected@file@percent }
-\citation{rumelhart1986}
+\citation{huang2024}
 \citation{chen2016}
 \citation{shwartz2022}
+\citation{cortes1995}
+\citation{rumelhart1986}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Modelos Implementados}{14}{subsection.4.4}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {4.4.1}Support Vector Machine (SVM)}{14}{subsubsection.4.4.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {4.4.2}Rede Neuronal (MLPClassifier)}{14}{subsubsection.4.4.2}\protected@file@percent }
+\citation{chen2016}
+\citation{shwartz2022}
 \citation{huang2024}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.4.3}XGBoost -- 3.º Modelo}{15}{subsubsection.4.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Validação Cruzada}{15}{subsection.4.5}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Cross-Validation Baseline -- F1 Macro ($\mu \pm \sigma $, 5 folds)}}{15}{table.caption.16}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Resultados do CV Baseline para todos os modelos e cenários.}}{16}{figure.caption.17}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5}Resultados e Discussão}{16}{section.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Resultados no Conjunto de Teste (Hold-out)}{16}{subsection.5.1}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Resultados finais no conjunto de teste hold-out -- métricas por modelo e cenário.}}{16}{table.caption.18}\protected@file@percent }
-\newlabel{tab:test_results}{{7}{16}{Resultados finais no conjunto de teste hold-out -- métricas por modelo e cenário}{table.caption.18}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Visualização gráfica da tabela comparativa final (hold-out test set).}}{17}{figure.caption.19}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Matrizes de Confusão}{17}{subsection.5.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.1}Cenário A -- Classificação Binária}{17}{subsubsection.5.2.1}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Confusion matrices normalizadas -- Cenário A (Binário).}}{17}{figure.caption.20}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.2}Cenário B -- 5 Classes}{18}{subsubsection.5.2.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Confusion matrices normalizadas -- Cenário B (5 Classes).}}{18}{figure.caption.21}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.3}Cenário C -- 10 Classes}{18}{subsubsection.5.2.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces Confusion matrices normalizadas -- Cenário C (10 Classes).}}{18}{figure.caption.22}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.4.3}XGBoost: 3.º Modelo}{15}{subsubsection.4.4.3}\protected@file@percent }
+\citation{paszke2019}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.4.4}Ensemble de Redes Neuronais (PyTorch)}{16}{subsubsection.4.4.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Configurações das 5 redes do ensemble PyTorch.}}{16}{table.caption.14}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Validação Cruzada}{16}{subsection.4.5}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Cross-Validation Baseline: F1 Macro ($\mu \pm \sigma $, 5 folds)}}{17}{table.caption.15}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Resultados do CV Baseline para todos os modelos e cenários.}}{17}{figure.caption.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Resultados e Discussão}{17}{section.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Resultados no Conjunto de Teste (Hold-out)}{17}{subsection.5.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces Resultados finais no conjunto de teste hold-out: métricas por modelo e cenário.}}{18}{table.caption.17}\protected@file@percent }
+\newlabel{tab:test_results}{{8}{18}{Resultados finais no conjunto de teste hold-out: métricas por modelo e cenário}{table.caption.17}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Visualização gráfica da tabela comparativa final (hold-out test set).}}{18}{figure.caption.18}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Matrizes de Confusão}{18}{subsection.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.1}Cenário A: Classificação Binária}{18}{subsubsection.5.2.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Confusion matrices normalizadas: Cenário A (Binário).}}{18}{figure.caption.19}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.2}Cenário B: 5 Classes}{19}{subsubsection.5.2.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces Confusion matrices normalizadas: Cenário B (5 Classes).}}{19}{figure.caption.20}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.3}Cenário C: 10 Classes}{19}{subsubsection.5.2.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces Confusion matrices normalizadas: Cenário C (10 Classes).}}{19}{figure.caption.21}\protected@file@percent }
 \citation{lei2024}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Curvas de Loss -- Rede Neuronal}{19}{subsection.5.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces Curvas de loss da MLP nos três cenários. A convergência sem divergência indica treino estável e ausência de overfitting grosseiro.}}{19}{figure.caption.23}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Análise Crítica por Cenário}{19}{subsection.5.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.4.1}Cenário A -- Classificação Binária}{19}{subsubsection.5.4.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.4.2}Cenário B -- 5 Classes}{19}{subsubsection.5.4.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.4.3}Cenário C -- Trade-offs de Granularidade (10 Classes)}{20}{subsubsection.5.4.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {15}{\ignorespaces Learning Curves do XGBoost. O patamar assintótico decresce do Cenário A ($\sim $0.94) para o C ($\sim $0.60), confirmando que o trade-off de granularidade é intrínseco ao problema e não resolúvel com mais dados.}}{20}{figure.caption.24}\protected@file@percent }
-\newlabel{fig:learning_curves_tradeoff}{{15}{20}{Learning Curves do XGBoost. O patamar assintótico decresce do Cenário A ($\sim $0.94) para o C ($\sim $0.60), confirmando que o trade-off de granularidade é intrínseco ao problema e não resolúvel com mais dados}{figure.caption.24}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Comparação entre Modelos}{20}{subsection.5.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.6}Efeito do Tuning de Hiperparâmetros}{21}{subsection.5.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.7}Interpretabilidade Local (SHAP)}{21}{subsection.5.7}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {16}{\ignorespaces SHAP Summary Plot -- XGBoost, Cenário A. Cada ponto representa uma instância; a posição horizontal indica a direção e magnitude do impacto no output do modelo.}}{22}{figure.caption.25}\protected@file@percent }
-\newlabel{fig:shap_xgb}{{16}{22}{SHAP Summary Plot -- XGBoost, Cenário A. Cada ponto representa uma instância; a posição horizontal indica a direção e magnitude do impacto no output do modelo}{figure.caption.25}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.8}Testes de Significância Estatística}{22}{subsection.5.8}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces Resultados do teste de McNemar -- valor-$p$ (exact). $\star $ = $p < 0.05$.}}{22}{table.caption.26}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Curvas de Loss da Rede Neuronal}{20}{subsection.5.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {15}{\ignorespaces Curvas de loss da MLP nos três cenários. A loss de treino converge de forma estável em todos os cenários; o val score no Cenário A apresenta oscilações mas sem divergência.}}{20}{figure.caption.22}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Análise Crítica por Cenário}{20}{subsection.5.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.4.1}Cenário A: Classificação Binária}{20}{subsubsection.5.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.4.2}Cenário B: 5 Classes}{21}{subsubsection.5.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.4.3}Cenário C: Trade-offs de Granularidade (10 Classes)}{21}{subsubsection.5.4.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {16}{\ignorespaces Learning Curves do XGBoost. O patamar assintótico decresce do Cenário A ($\sim $0.94) para o C ($\sim $0.60), confirmando que o trade-off de granularidade é intrínseco ao problema e não resolúvel com mais dados.}}{22}{figure.caption.23}\protected@file@percent }
+\newlabel{fig:learning_curves_tradeoff}{{16}{22}{Learning Curves do XGBoost. O patamar assintótico decresce do Cenário A ($\sim $0.94) para o C ($\sim $0.60), confirmando que o trade-off de granularidade é intrínseco ao problema e não resolúvel com mais dados}{figure.caption.23}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Comparação entre Modelos}{22}{subsection.5.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.6}Efeito do Tuning de Hiperparâmetros}{22}{subsection.5.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.7}Ensemble de Redes Neuronais (PyTorch)}{22}{subsection.5.7}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {9}{\ignorespaces Comparação do ensemble PyTorch com a MLP sklearn no conjunto de teste (F1 macro).}}{23}{table.caption.24}\protected@file@percent }
+\newlabel{tab:ensemble_results}{{9}{23}{Comparação do ensemble PyTorch com a MLP sklearn no conjunto de teste (F1 macro)}{table.caption.24}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.8}Interpretabilidade Local (SHAP)}{23}{subsection.5.8}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {17}{\ignorespaces SHAP Summary Plot: XGBoost, Cenário A. Cada ponto representa uma instância; a posição horizontal indica a direção e magnitude do impacto no output do modelo.}}{24}{figure.caption.25}\protected@file@percent }
+\newlabel{fig:shap_xgb}{{17}{24}{SHAP Summary Plot: XGBoost, Cenário A. Cada ponto representa uma instância; a posição horizontal indica a direção e magnitude do impacto no output do modelo}{figure.caption.25}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.9}Testes de Significância Estatística}{24}{subsection.5.9}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {10}{\ignorespaces Resultados do teste de McNemar: valor-$p$ (exact). $\star $ = $p < 0.05$.}}{24}{table.caption.26}\protected@file@percent }
 \citation{tolstoyj2024}
 \citation{lei2024}
 \citation{huang2024}
 \citation{acosta2025}
-\@writefile{lot}{\contentsline {table}{\numberline {9}{\ignorespaces Resultados do teste de Wilcoxon com $k=5$ folds. Nenhum par atinge $p < 0.05$.}}{23}{table.caption.27}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.9}Comparação com Trabalhos Existentes}{23}{subsection.5.9}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.10}Limitações e Desafios}{23}{subsection.5.10}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {11}{\ignorespaces Resultados do teste de Wilcoxon com $k=5$ folds. Nenhum par atinge $p < 0.05$.}}{25}{table.caption.27}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.10}Comparação com Trabalhos Existentes}{25}{subsection.5.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.11}Limitações e Desafios}{25}{subsection.5.11}\protected@file@percent }
 \citation{lei2024}
 \citation{acosta2025}
 \bibcite{cortes1995}{1}
-\@writefile{toc}{\contentsline {section}{\numberline {6}Conclusões}{24}{section.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Conclusões}{26}{section.6}\protected@file@percent }
 \bibcite{rumelhart1986}{2}
 \bibcite{chen2016}{3}
 \bibcite{shwartz2022}{4}
-\bibcite{pedregosa2011}{5}
-\bibcite{kaggle}{6}
-\bibcite{badrnezhad2024}{7}
-\bibcite{tolstoyj2024}{8}
-\bibcite{huang2024}{9}
-\bibcite{lei2024}{10}
-\bibcite{acosta2025}{11}
-\gdef \@abspage@last{26}
+\bibcite{paszke2019}{5}
+\bibcite{pedregosa2011}{6}
+\bibcite{kaggle}{7}
+\bibcite{badrnezhad2024}{8}
+\bibcite{tolstoyj2024}{9}
+\bibcite{huang2024}{10}
+\bibcite{lei2024}{11}
+\bibcite{acosta2025}{12}
+\gdef \@abspage@last{28}

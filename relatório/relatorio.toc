@@ -14,30 +14,29 @@
 \contentsline {subsubsection}{\numberline {4.2.1}Divisão dos Dados}{11}{subsubsection.4.2.1}%
 \contentsline {subsubsection}{\numberline {4.2.2}Normalização e Prevenção de Data Leakage}{11}{subsubsection.4.2.2}%
 \contentsline {subsubsection}{\numberline {4.2.3}Lidar com o Desequilíbrio de Classes}{11}{subsubsection.4.2.3}%
-\contentsline {paragraph}{Metodologia de seleção do nível.}{12}{section*.11}%
-\contentsline {paragraph}{Resultados da comparação.}{12}{section*.12}%
-\contentsline {paragraph}{Decisão e justificação.}{13}{section*.15}%
 \contentsline {subsection}{\numberline {4.3}Métricas de Avaliação}{13}{subsection.4.3}%
-\contentsline {subsection}{\numberline {4.4}Modelos Implementados}{13}{subsection.4.4}%
+\contentsline {subsection}{\numberline {4.4}Modelos Implementados}{14}{subsection.4.4}%
 \contentsline {subsubsection}{\numberline {4.4.1}Support Vector Machine (SVM)}{14}{subsubsection.4.4.1}%
 \contentsline {subsubsection}{\numberline {4.4.2}Rede Neuronal (MLPClassifier)}{14}{subsubsection.4.4.2}%
-\contentsline {subsubsection}{\numberline {4.4.3}XGBoost -- 3.º Modelo}{15}{subsubsection.4.4.3}%
-\contentsline {subsection}{\numberline {4.5}Validação Cruzada}{15}{subsection.4.5}%
-\contentsline {section}{\numberline {5}Resultados e Discussão}{16}{section.5}%
-\contentsline {subsection}{\numberline {5.1}Resultados no Conjunto de Teste (Hold-out)}{16}{subsection.5.1}%
-\contentsline {subsection}{\numberline {5.2}Matrizes de Confusão}{17}{subsection.5.2}%
-\contentsline {subsubsection}{\numberline {5.2.1}Cenário A -- Classificação Binária}{17}{subsubsection.5.2.1}%
-\contentsline {subsubsection}{\numberline {5.2.2}Cenário B -- 5 Classes}{18}{subsubsection.5.2.2}%
-\contentsline {subsubsection}{\numberline {5.2.3}Cenário C -- 10 Classes}{18}{subsubsection.5.2.3}%
-\contentsline {subsection}{\numberline {5.3}Curvas de Loss -- Rede Neuronal}{19}{subsection.5.3}%
-\contentsline {subsection}{\numberline {5.4}Análise Crítica por Cenário}{19}{subsection.5.4}%
-\contentsline {subsubsection}{\numberline {5.4.1}Cenário A -- Classificação Binária}{19}{subsubsection.5.4.1}%
-\contentsline {subsubsection}{\numberline {5.4.2}Cenário B -- 5 Classes}{19}{subsubsection.5.4.2}%
-\contentsline {subsubsection}{\numberline {5.4.3}Cenário C -- Trade-offs de Granularidade (10 Classes)}{20}{subsubsection.5.4.3}%
-\contentsline {subsection}{\numberline {5.5}Comparação entre Modelos}{20}{subsection.5.5}%
-\contentsline {subsection}{\numberline {5.6}Efeito do Tuning de Hiperparâmetros}{21}{subsection.5.6}%
-\contentsline {subsection}{\numberline {5.7}Interpretabilidade Local (SHAP)}{21}{subsection.5.7}%
-\contentsline {subsection}{\numberline {5.8}Testes de Significância Estatística}{22}{subsection.5.8}%
-\contentsline {subsection}{\numberline {5.9}Comparação com Trabalhos Existentes}{23}{subsection.5.9}%
-\contentsline {subsection}{\numberline {5.10}Limitações e Desafios}{23}{subsection.5.10}%
-\contentsline {section}{\numberline {6}Conclusões}{24}{section.6}%
+\contentsline {subsubsection}{\numberline {4.4.3}XGBoost: 3.º Modelo}{15}{subsubsection.4.4.3}%
+\contentsline {subsubsection}{\numberline {4.4.4}Ensemble de Redes Neuronais (PyTorch)}{16}{subsubsection.4.4.4}%
+\contentsline {subsection}{\numberline {4.5}Validação Cruzada}{16}{subsection.4.5}%
+\contentsline {section}{\numberline {5}Resultados e Discussão}{17}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Resultados no Conjunto de Teste (Hold-out)}{17}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Matrizes de Confusão}{18}{subsection.5.2}%
+\contentsline {subsubsection}{\numberline {5.2.1}Cenário A: Classificação Binária}{18}{subsubsection.5.2.1}%
+\contentsline {subsubsection}{\numberline {5.2.2}Cenário B: 5 Classes}{19}{subsubsection.5.2.2}%
+\contentsline {subsubsection}{\numberline {5.2.3}Cenário C: 10 Classes}{19}{subsubsection.5.2.3}%
+\contentsline {subsection}{\numberline {5.3}Curvas de Loss da Rede Neuronal}{20}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}Análise Crítica por Cenário}{20}{subsection.5.4}%
+\contentsline {subsubsection}{\numberline {5.4.1}Cenário A: Classificação Binária}{20}{subsubsection.5.4.1}%
+\contentsline {subsubsection}{\numberline {5.4.2}Cenário B: 5 Classes}{21}{subsubsection.5.4.2}%
+\contentsline {subsubsection}{\numberline {5.4.3}Cenário C: Trade-offs de Granularidade (10 Classes)}{21}{subsubsection.5.4.3}%
+\contentsline {subsection}{\numberline {5.5}Comparação entre Modelos}{22}{subsection.5.5}%
+\contentsline {subsection}{\numberline {5.6}Efeito do Tuning de Hiperparâmetros}{22}{subsection.5.6}%
+\contentsline {subsection}{\numberline {5.7}Ensemble de Redes Neuronais (PyTorch)}{22}{subsection.5.7}%
+\contentsline {subsection}{\numberline {5.8}Interpretabilidade Local (SHAP)}{23}{subsection.5.8}%
+\contentsline {subsection}{\numberline {5.9}Testes de Significância Estatística}{24}{subsection.5.9}%
+\contentsline {subsection}{\numberline {5.10}Comparação com Trabalhos Existentes}{25}{subsection.5.10}%
+\contentsline {subsection}{\numberline {5.11}Limitações e Desafios}{25}{subsection.5.11}%
+\contentsline {section}{\numberline {6}Conclusões}{26}{section.6}%
