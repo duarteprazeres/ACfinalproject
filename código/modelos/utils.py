@@ -108,16 +108,28 @@ def log_experiment(model_name, scenario, params, metrics, split='val'):
 # =============================================================
 # GRÁFICOS
 # =============================================================
+def _model_cmap(model_name):
+    """Devolve o colormap correspondente à cor do modelo no gráfico de barras da fig. 9."""
+    name = model_name.lower()
+    if 'svm' in name:
+        return 'Blues'
+    if 'nn' in name or 'mlp' in name:
+        return 'Oranges'
+    if 'xgb' in name or 'xgboost' in name:
+        return 'Greens'
+    return 'Blues'
+
+
 def plot_confusion_matrix_fig(y_true, y_pred, model_name, scenario_name):
     """
     Gera e guarda uma imagem da matriz de confusão normalizada na pasta 'graficos/'.
-    Mapeia graficamente as verdadeiras classes contra as predições do modelo para facilitar a análise.
+    Usa o colormap da cor do modelo no gráfico de barras CV (SVM=Blues, NN=Oranges, XGB=Greens).
     """
     cm  = confusion_matrix(y_true, y_pred, normalize='true')
     n   = len(np.unique(y_true))
     fig, ax = plt.subplots(figsize=(max(6, n), max(5, n - 1)))
     disp = ConfusionMatrixDisplay(confusion_matrix=cm)
-    disp.plot(ax=ax, colorbar=True, cmap='Blues', values_format='.2f')
+    disp.plot(ax=ax, colorbar=True, cmap=_model_cmap(model_name), values_format='.2f')
     ax.set_title(f'Confusion Matrix (Norm.) — {model_name} | Cenário {scenario_name}')
     plt.tight_layout()
     fname = GRAFICOS_DIR / f'cm_{model_name.lower().replace(" ", "_")}_{scenario_name}.png'

@@ -209,19 +209,42 @@ def run_eda(df):
     plt.close()
     
     # 4. Box plots por classe (equal-width) — Cenário B e Cenário C
+    # Mesmas paletas usadas nos pairplots da figura 7
     if len(num_cols) >= 2:
+        from matplotlib.colors import LinearSegmentedColormap
+        import matplotlib.cm as cm
+
+        # Cenário B — viridis (igual ao pairplot B)
+        _palette_B = sns.color_palette('viridis', 5)
         plt.figure(figsize=(12, 6))
-        sns.boxplot(x='target_B_ew', y='mental_fatigue_score', data=df)
+        sns.boxplot(x='target_B_ew', y='mental_fatigue_score', data=df, palette=_palette_B)
         plt.title('mental_fatigue_score por Classe - Cenário B (5 classes, equal-width)')
         plt.xlabel('Classe')
-        plt.savefig('graficos/eda_boxplot.png')
+        plt.tight_layout()
+        plt.savefig('graficos/eda_boxplot.png', dpi=150)
         plt.close()
 
+        # Cenário C — arco-íris personalizado (igual ao pairplot C)
+        _waypoints_bp = [
+            cm.viridis(0.0),
+            (0.15, 0.10, 0.85, 1.0),
+            (0.00, 0.45, 0.90, 1.0),
+            (0.00, 0.80, 0.80, 1.0),
+            (0.00, 0.75, 0.20, 1.0),
+            (0.80, 0.90, 0.00, 1.0),
+            (1.00, 0.85, 0.00, 1.0),
+            (1.00, 0.55, 0.00, 1.0),
+            (1.00, 0.20, 0.00, 1.0),
+            (0.90, 0.00, 0.00, 1.0),
+        ]
+        _cmap_bp = LinearSegmentedColormap.from_list('arco_iris', _waypoints_bp, N=10)
+        _palette_C = [_cmap_bp(i / 9) for i in range(10)]
         plt.figure(figsize=(14, 6))
-        sns.boxplot(x='target_C_ew', y='mental_fatigue_score', data=df)
+        sns.boxplot(x='target_C_ew', y='mental_fatigue_score', data=df, palette=_palette_C)
         plt.title('mental_fatigue_score por Classe - Cenário C (10 classes, equal-width)')
         plt.xlabel('Classe')
-        plt.savefig('graficos/eda_boxplot_C.png')
+        plt.tight_layout()
+        plt.savefig('graficos/eda_boxplot_C.png', dpi=150)
         plt.close()
 
         # 5. Pair plots das 3 variáveis mais correlacionadas com stress_level
