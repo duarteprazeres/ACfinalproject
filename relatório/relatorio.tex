@@ -837,13 +837,13 @@ NN/MLP  & A & \textbf{0.9502} & \textbf{0.9502} & 0.9004 & 0.9006 & 0.9906 \\
 SVM     & A & 0.9476          & 0.9476          & 0.8951 & 0.8951 & \textbf{0.9916} \\
 XGBoost & A & 0.9462          & 0.9462          & 0.8924 & 0.8925 & 0.9905 \\
 \midrule
-SVM     & B & \textbf{0.8229} & \textbf{0.8418} & \textbf{0.7817} & 0.7823 & \textbf{0.9683} \\
-XGBoost & B & 0.8201          & 0.8391          & 0.7778 & 0.7782 & 0.9656 \\
-NN/MLP  & B & 0.8124          & 0.8351          & 0.7709 & 0.7710 & 0.9658 \\
+SVM     & B & \textbf{0.7526} & 0.7893          & 0.7168          & 0.7184          & \textbf{0.9629} \\
+XGBoost & B & 0.7519          & 0.7911          & 0.7187          & 0.7202          & 0.9602 \\
+NN/MLP  & B & 0.7504          & \textbf{0.7982} & \textbf{0.7239} & \textbf{0.7241} & 0.9607 \\
 \midrule
-XGBoost & C & \textbf{0.5819} & \textbf{0.6382} & \textbf{0.5721} & \textbf{0.5731} & 0.9336 \\
-SVM     & C & 0.5766          & 0.6284          & 0.5615 & 0.5624 & \textbf{0.9389} \\
-NN/MLP  & C & 0.5700          & 0.6351          & 0.5655 & 0.5656 & 0.9361 \\
+SVM     & C & \textbf{0.5178} & 0.5996          & 0.5276          & 0.5292          & \textbf{0.9413} \\
+NN/MLP  & C & 0.4994          & \textbf{0.6142} & \textbf{0.5352} & \textbf{0.5361} & 0.9392 \\
+XGBoost & C & 0.4991          & 0.5898          & 0.5150          & 0.5171          & 0.9352 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -999,7 +999,7 @@ maior separabilidade de classes.
 
 \subsubsection{Cenário B: 5 Classes}
 
-No Cenário B, o desempenho desceu para F1 $\approx$ 0.81--0.82, o que consideramos
+No Cenário B, o desempenho desceu para F1 $\approx$ 0.75, o que consideramos
 razoável para um problema de 5 classes. Ao analisar as matrizes de confusão, encontrámos
 um padrão interessante que nos ajudou a perceber melhor o problema:
 \begin{itemize}
@@ -1011,7 +1011,7 @@ um padrão interessante que nos ajudou a perceber melhor o problema:
     é genuinamente ambígua.
 \end{itemize}
 
-O facto de o \textbf{SVM} ter obtido o melhor resultado no Cenário B (F1=0.8229) foi uma
+O facto de o \textbf{SVM} ter obtido o melhor resultado no Cenário B (F1=0.7526) foi uma
 surpresa. Verificámos que o GridSearch selecionou o \textbf{kernel linear} em vez do
 RBF default, o que sugere que, após normalização, o espaço de features é aproximadamente
 linearmente separável para as 5 classes, e que a margem máxima do SVM linear se revelou
@@ -1071,11 +1071,11 @@ nos levou a conclusões concretas:
     regularização L2). Acreditamos que uma arquitetura mais profunda com Dropout real
     melhoraria os resultados nos Cenários B e C, mas ficámos satisfeitos com o que
     a MLP do scikit-learn conseguiu alcançar.
-  \item \textbf{SVM}: foi o melhor no Cenário B (F1=0.8229) e manteve-se sempre
+  \item \textbf{SVM}: foi o melhor nos Cenários B (F1=0.7526) e C (F1=0.5178) e manteve-se sempre
     competitivo. A sua principal desvantagem que observámos foi o custo computacional
 sendo que o treino foi significativamente mais lento do que os outros dois modelos,
     especialmente com kernel RBF ($O(n^2)$).
-  \item \textbf{XGBoost}: foi o melhor no Cenário C (F1=0.5819) e segundo no A.
+  \item \textbf{XGBoost}: ficou muito próximo dos melhores em todos os cenários, segundo no A e B.
     Foi também o mais rápido e estável a treinar, graças ao early stopping e à
     invariância à escala. No geral, confirmou as expectativas que tínhamos criado
     com base na literatura.
@@ -1104,15 +1104,16 @@ scikit-learn no conjunto de teste.
 \toprule
 \textbf{Modelo} & \textbf{Cenário A} & \textbf{Cenário B} & \textbf{Cenário C} \\
 \midrule
-NN/MLP sklearn (tuned) & \textbf{0.9502} & 0.8124 & 0.5700 \\
-Ensemble PyTorch       & 0.9489          & 0.7572 & 0.4932 \\
+NN/MLP sklearn (tuned) & \textbf{0.9502} & 0.7504          & \textbf{0.4994} \\
+Ensemble PyTorch       & 0.9489          & \textbf{0.7572} & 0.4932          \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 No \textbf{Cenário A}, o ensemble atinge 0.9489, praticamente idêntico à MLP individual
 (diferença de 0.001), confirmando que os dois modelos capturam o problema binário com
-a mesma eficácia. Nos \textbf{Cenários B e C}, o ensemble fica abaixo da MLP sklearn. O tuning
+a mesma eficácia. No \textbf{Cenário B}, o ensemble supera ligeiramente a MLP sklearn
+(0.7572 vs.\ 0.7504); no \textbf{Cenário C}, fica abaixo (0.4932 vs.\ 0.4994). O tuning
 específico por cenário não foi realizado por duas razões: o ensemble é uma das últimas
 matérias lecionadas na disciplina, pelo que a sua implementação ocorreu nos últimos dias
 do projeto, não deixando tempo útil suficiente para realizar o tuning; além disso,
@@ -1255,16 +1256,16 @@ Os principais resultados que obtivemos foram:
   \item F1 macro de $\approx$0.95 no Cenário A, onde a \textbf{NN/MLP} superou ligeiramente
     os outros dois (0.9502), o que foi uma surpresa positiva, e coloca o nosso trabalho
     a par da literatura para datasets sintéticos comportamentais;
-  \item F1 macro de $\approx$0.82 no Cenário B, onde o \textbf{SVM} se destacou (0.8229),
+  \item F1 macro de $\approx$0.75 no Cenário B, onde o \textbf{SVM} se destacou (0.7526),
     com a confusão esperada nas classes intermédias que identificámos e explicámos;
-  \item F1 macro de $\approx$0.58 no Cenário C, onde o \textbf{XGBoost} liderou (0.5819),
+  \item F1 macro de $\approx$0.52 no Cenário C, onde o \textbf{SVM} liderou (0.5178),
     mas reconhecemos que este cenário representa um problema difícil por natureza e não
     por falha dos modelos.
 \end{itemize}
 
-Os testes de McNemar que realizámos revelaram que apenas a diferença SVM vs.\ NN no
-Cenário C é estatisticamente significativa ($p = 0.044$); nos outros cenários, os três
-modelos são equivalentes entre si. Comparando com a literatura, os nossos resultados
+Os testes de McNemar que realizámos revelaram que os três pares de modelos no Cenário C
+são estatisticamente significativos (SVM vs.\ NN: $p = 0.030$; SVM vs.\ XGB: $p = 0.008$;
+NN vs.\ XGB: $p < 0.001$); nos Cenários A e B, os três modelos são equivalentes entre si. Comparando com a literatura, os nossos resultados
 são consistentes com os trabalhos sobre dados sintéticos de stress/sono \cite{lei2024},
 embora naturalmente abaixo dos obtidos com sinais fisiológicos reais \cite{acosta2025}.
 

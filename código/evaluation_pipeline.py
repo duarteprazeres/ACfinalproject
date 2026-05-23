@@ -30,10 +30,10 @@ from sklearn.metrics import (
 )
 from sklearn.preprocessing import LabelEncoder
 
-from utils import (
+from código.modelos.utils import (
     split_scenario, CV_FOLDS, RANDOM_STATE, GRAFICOS_DIR, MODELS_DIR
 )
-from data_pipeline import load_and_inspect_data, generate_targets, feature_engineering
+from código.data_pipeline import load_and_inspect_data, generate_targets, feature_engineering
 
 # ── statsmodels McNemar ──────────────────────────────────────────────────────
 try:

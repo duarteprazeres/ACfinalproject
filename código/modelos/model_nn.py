@@ -37,7 +37,7 @@ from código.modelos.utils import (
     plot_cv_baseline, split_scenario, save_model, update_registry,
     CV_FOLDS, RANDOM_STATE, GRAFICOS_DIR
 )
-from data_pipeline import load_and_inspect_data, generate_targets, feature_engineering
+from código.data_pipeline import load_and_inspect_data, generate_targets, feature_engineering
 
 
 # =============================================================

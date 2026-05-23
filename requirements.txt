@@ -10,4 +10,5 @@ imbalanced-learn
 mlflow
 joblib
 scipy
+shap
 yellowbrick

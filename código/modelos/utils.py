@@ -27,7 +27,7 @@ from sklearn.metrics import (
 # =============================================================
 # CONSTANTES GLOBAIS
 # =============================================================
-RESULTS_CSV  = 'experiment_results.csv'
+RESULTS_CSV  = 'models/experiment_results.csv'
 MODELS_DIR   = Path('models')
 GRAFICOS_DIR = Path('graficos')
 RANDOM_STATE = 42

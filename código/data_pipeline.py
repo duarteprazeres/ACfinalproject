@@ -436,7 +436,9 @@ def main():
     print("       PIPELINE FINAL COMPLETA (1.1 a 1.7)      ")
     print("==================================================")
     
-    filepath = 'sleep_mobile_stress_dataset_15000.csv'
+    filepath = 'dataset/sleep_mobile_stress_dataset_15000.csv'
+    if not os.path.exists(filepath):
+        filepath = 'sleep_mobile_stress_dataset_15000.csv'
     if not os.path.exists(filepath):
         print(f"Erro: O ficheiro '{filepath}' não foi encontrado.")
         return
